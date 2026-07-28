@@ -14,7 +14,13 @@ struct ProfileStore {
         guard let data = try? Data(contentsOf: profilesURL) else {
             return []
         }
-        return (try? JSONDecoder().decode([AccountProfile].self, from: data)) ?? []
+        guard var profiles = try? JSONDecoder().decode([AccountProfile].self, from: data) else {
+            return []
+        }
+        for index in profiles.indices where profiles[index].snapshotState == .fresh || profiles[index].snapshotState == .refreshing {
+            profiles[index].snapshotState = profiles[index].snapshot == nil ? .signInRequired : .cached
+        }
+        return profiles
     }
 
     func save(_ profiles: [AccountProfile]) throws {

@@ -2,20 +2,68 @@ import XCTest
 @testable import CodexSwitch
 
 final class QuotaResponseDecoderTests: XCTestCase {
-    func testDecodesReturnedQuotaBuckets() throws {
-        let account = Data("{\"result\":{\"account\":{\"email\":\"one@example.com\",\"planType\":\"pro\"}}}".utf8)
-        let limits = Data("{\"result\":{\"rateLimitsByLimitId\":{\"codex\":{\"limitName\":\"Codex\",\"primary\":{\"usedPercent\":25,\"resetsAt\":1730947200}}},\"rateLimitResetCredits\":{\"availableCount\":2}}}".utf8)
+    private let account = Data(#"{"result":{"account":{"email":"account@example.test","planType":"pro"}}}"#.utf8)
+    private let now = Date(timeIntervalSince1970: 100)
 
-        let snapshot = try QuotaResponseDecoder.snapshot(
-            accountResponse: account,
-            limitsResponse: limits,
-            now: Date(timeIntervalSince1970: 100)
-        )
+    func testDecodesMultipleBucketsPrimarySecondaryAndCreditDetails() throws {
+        let limits = Data(#"""
+        {"result":{"rateLimitsByLimitId":{
+          "codex":{"limitId":"codex","limitName":"Codex","planType":"pro","rateLimitReachedType":"primary","primary":{"usedPercent":25,"windowDurationMins":15,"resetsAt":1730947200},"secondary":{"usedPercent":40,"windowDurationMins":10080,"resetsAt":1731552000}},
+          "other":{"limitId":"other","limitName":null,"primary":{"usedPercent":5,"windowDurationMins":60,"resetsAt":1730950800}}
+        },"rateLimitResetCredits":{"availableCount":3,"credits":[{"id":"opaque-credit-id-not-persisted","resetType":"codexRateLimits","status":"available","grantedAt":1730000000,"expiresAt":1732000000,"title":"Rate-limit reset","description":"Reset an eligible window."}]}}}
+        """#.utf8)
 
-        XCTAssertEqual(snapshot.email, "one@example.com")
+        let snapshot = try QuotaResponseDecoder.snapshot(accountResponse: account, limitsResponse: limits, now: now)
+
+        XCTAssertEqual(snapshot.email, "account@example.test")
         XCTAssertEqual(snapshot.plan, "pro")
-        XCTAssertEqual(snapshot.buckets.map(\.id), ["codex"])
-        XCTAssertEqual(snapshot.buckets.first?.usedPercent, 25)
-        XCTAssertEqual(snapshot.resetCreditCount, 2)
+        XCTAssertEqual(snapshot.buckets.map(\.id), ["codex", "other"])
+        XCTAssertEqual(snapshot.buckets[0].reachedType, "primary")
+        XCTAssertEqual(snapshot.buckets[0].windows.map(\.kind), [.primary, .secondary])
+        XCTAssertEqual(snapshot.buckets[0].windows[0].usedPercent, 25)
+        XCTAssertEqual(snapshot.buckets[0].windows[0].windowDurationMinutes, 15)
+        XCTAssertEqual(snapshot.buckets[0].windows[1].resetAt, Date(timeIntervalSince1970: 1731552000))
+        XCTAssertEqual(snapshot.resetCredits?.availableCount, 3)
+        XCTAssertEqual(snapshot.resetCredits?.details?.first?.expiresAt, Date(timeIntervalSince1970: 1732000000))
+    }
+
+    func testKeepsMissingLabelsAndMissingWindowFieldsUnavailable() throws {
+        let limits = Data(#"{"result":{"rateLimitsByLimitId":{"custom":{"primary":{"usedPercent":12}}},"rateLimitResetCredits":null}}"#.utf8)
+
+        let snapshot = try QuotaResponseDecoder.snapshot(accountResponse: account, limitsResponse: limits, now: now)
+
+        XCTAssertEqual(snapshot.buckets.first?.id, "custom")
+        XCTAssertNil(snapshot.buckets.first?.name)
+        XCTAssertEqual(snapshot.buckets.first?.windows.first?.usedPercent, 12)
+        XCTAssertNil(snapshot.buckets.first?.windows.first?.windowDurationMinutes)
+        XCTAssertNil(snapshot.buckets.first?.windows.first?.resetAt)
+        XCTAssertNil(snapshot.resetCredits)
+    }
+
+    func testDecodesKnownEmptyCreditDetailsAndLegacySingleBucket() throws {
+        let limits = Data(#"{"result":{"rateLimits":{"limitId":"legacy","limitName":"Legacy","primary":{"usedPercent":50,"windowDurationMins":30}},"rateLimitResetCredits":{"availableCount":1,"credits":[]}}}"#.utf8)
+
+        let snapshot = try QuotaResponseDecoder.snapshot(accountResponse: account, limitsResponse: limits, now: now)
+
+        XCTAssertEqual(snapshot.buckets.map(\.id), ["legacy"])
+        XCTAssertEqual(snapshot.resetCredits?.availableCount, 1)
+        XCTAssertEqual(snapshot.resetCredits?.details, [])
+    }
+
+    func testExpiredCredentialsAndTimeoutAreRedactedProductErrors() {
+        XCTAssertEqual(
+            CodexAppServerClient.redactedError(forServerMessage: "Authentication credential has expired."),
+            .signInRequired
+        )
+        XCTAssertEqual(CodexAppServerClient.ClientError.requestTimedOut.errorDescription, "Codex did not respond within 30 seconds.")
+        XCTAssertFalse(CodexAppServerClient.ClientError.server.errorDescription?.contains("credential") ?? true)
+    }
+
+    func testQuotaPresentationUsesRemainingPercentAndWholeMinutes() {
+        XCTAssertEqual(QuotaPresentation.remainingPercent(from: 63), 37)
+        XCTAssertEqual(QuotaPresentation.remainingPercent(from: 120), 0)
+        XCTAssertEqual(QuotaPresentation.updatedText(for: now, now: now.addingTimeInterval(59)), "Updated just now")
+        XCTAssertEqual(QuotaPresentation.updatedText(for: now, now: now.addingTimeInterval(61)), "Updated 1 min ago")
+        XCTAssertEqual(QuotaPresentation.updatedText(for: now, now: now.addingTimeInterval(181)), "Updated 3 min ago")
     }
 }

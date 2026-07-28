@@ -20,7 +20,7 @@ final class AppState {
         do {
             try await loginAndRefresh(profile: profile)
         } catch {
-            update(profileID: profile.id) { $0.lastError = error.localizedDescription }
+            recordFailure(error, for: profile.id)
         }
     }
 
@@ -34,6 +34,10 @@ final class AppState {
     }
 
     private func loginAndRefresh(profile: AccountProfile) async throws {
+        update(profileID: profile.id) {
+            $0.snapshotState = .refreshing
+            $0.lastError = nil
+        }
         let client = CodexAppServerClient()
         defer { Task { await client.stop() } }
         try await client.start(codexHome: try store.codexHome(for: profile))
@@ -42,11 +46,16 @@ final class AppState {
         update(profileID: profile.id) {
             $0.snapshot = snapshot
             $0.label = snapshot.email ?? $0.label
+            $0.snapshotState = .fresh
             $0.lastError = nil
         }
     }
 
     private func refresh(profile: AccountProfile) async {
+        update(profileID: profile.id) {
+            $0.snapshotState = .refreshing
+            $0.lastError = nil
+        }
         let client = CodexAppServerClient()
         do {
             defer { Task { await client.stop() } }
@@ -55,10 +64,23 @@ final class AppState {
             update(profileID: profile.id) {
                 $0.snapshot = snapshot
                 $0.label = snapshot.email ?? $0.label
+                $0.snapshotState = .fresh
                 $0.lastError = nil
             }
         } catch {
-            update(profileID: profile.id) { $0.lastError = error.localizedDescription }
+            recordFailure(error, for: profile.id)
+        }
+    }
+
+    private func recordFailure(_ error: Error, for profileID: UUID) {
+        update(profileID: profileID) {
+            $0.lastError = error.localizedDescription
+            if let clientError = error as? CodexAppServerClient.ClientError,
+               case .signInRequired = clientError {
+                $0.snapshotState = .signInRequired
+            } else {
+                $0.snapshotState = $0.snapshot == nil ? .failed : .cached
+            }
         }
     }
 

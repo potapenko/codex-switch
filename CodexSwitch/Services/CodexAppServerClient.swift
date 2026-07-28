@@ -2,11 +2,13 @@ import AppKit
 import Foundation
 
 actor CodexAppServerClient {
-    enum ClientError: LocalizedError {
+    enum ClientError: LocalizedError, Equatable {
         case unavailable
         case invalidResponse
-        case server(String)
+        case server
+        case requestTimedOut
         case loginTimedOut
+        case signInRequired
 
         var errorDescription: String? {
             switch self {
@@ -14,10 +16,14 @@ actor CodexAppServerClient {
                 return "Codex CLI is unavailable. Install or update Codex, then try again."
             case .invalidResponse:
                 return "Codex returned an unreadable response."
-            case let .server(message):
-                return message
+            case .server:
+                return "Codex could not complete the request."
+            case .requestTimedOut:
+                return "Codex did not respond within 30 seconds."
             case .loginTimedOut:
                 return "Login did not finish within five minutes."
+            case .signInRequired:
+                return "Sign in is required to refresh this account."
             }
         }
     }
@@ -104,18 +110,40 @@ actor CodexAppServerClient {
     }
 
     private func request(method: String, params: [String: Any]) async throws -> Data {
+        try await withThrowingTaskGroup(of: Data.self) { group in
+            group.addTask { [weak self] in
+                guard let self else { throw CancellationError() }
+                return try await self.requestWithoutTimeout(method: method, params: params)
+            }
+            group.addTask {
+                try await Task.sleep(for: .seconds(30))
+                throw ClientError.requestTimedOut
+            }
+            defer { group.cancelAll() }
+            guard let result = try await group.next() else { throw ClientError.requestTimedOut }
+            return result
+        }
+    }
+
+    private func requestWithoutTimeout(method: String, params: [String: Any]) async throws -> Data {
         let requestID = nextRequestID
         nextRequestID += 1
         let message: [String: Any] = ["method": method, "id": requestID, "params": params]
         let data = try JSONSerialization.data(withJSONObject: message)
 
-        return try await withCheckedThrowingContinuation { continuation in
-            pending[requestID] = continuation
-            do {
-                try write(data)
-            } catch {
-                pending.removeValue(forKey: requestID)
-                continuation.resume(throwing: error)
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                pending[requestID] = continuation
+                do {
+                    try write(data)
+                } catch {
+                    pending.removeValue(forKey: requestID)
+                    continuation.resume(throwing: error)
+                }
+            }
+        } onCancel: {
+            Task { [weak self] in
+                await self?.cancelPendingRequest(requestID)
             }
         }
     }
@@ -137,7 +165,7 @@ actor CodexAppServerClient {
         }
         if let id = message["id"] as? Int, let continuation = pending.removeValue(forKey: id) {
             if let error = message["error"] as? [String: Any], let text = error["message"] as? String {
-                continuation.resume(throwing: ClientError.server(text))
+                continuation.resume(throwing: Self.redactedError(forServerMessage: text))
             } else {
                 continuation.resume(returning: data)
             }
@@ -147,7 +175,7 @@ actor CodexAppServerClient {
               let continuation = loginContinuation else { return }
         loginContinuation = nil
         let success = (message["params"] as? [String: Any])?["success"] as? Bool ?? false
-        success ? continuation.resume() : continuation.resume(throwing: ClientError.server("Login was not completed."))
+        success ? continuation.resume() : continuation.resume(throwing: ClientError.server)
     }
 
     private func waitForLogin() async throws {
@@ -166,8 +194,14 @@ actor CodexAppServerClient {
     }
 
     private func waitForLoginNotification() async throws {
-        try await withCheckedThrowingContinuation { continuation in
-            loginContinuation = continuation
+        try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                loginContinuation = continuation
+            }
+        } onCancel: {
+            Task { [weak self] in
+                await self?.cancelLoginWait()
+            }
         }
     }
 
@@ -179,5 +213,22 @@ actor CodexAppServerClient {
         }
         loginContinuation?.resume(throwing: error)
         loginContinuation = nil
+    }
+
+    private func cancelPendingRequest(_ requestID: Int) {
+        pending.removeValue(forKey: requestID)?.resume(throwing: CancellationError())
+    }
+
+    private func cancelLoginWait() {
+        loginContinuation?.resume(throwing: CancellationError())
+        loginContinuation = nil
+    }
+
+    static func redactedError(forServerMessage message: String) -> ClientError {
+        let normalized = message.lowercased()
+        if normalized.contains("sign in") || normalized.contains("login") || normalized.contains("auth") || normalized.contains("credential") {
+            return .signInRequired
+        }
+        return .server
     }
 }

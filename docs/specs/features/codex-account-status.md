@@ -12,8 +12,8 @@ five separately authenticated ChatGPT accounts.
 - Read the account identity/plan and the quota buckets, reset times, and
   available earned-reset credits that the app-server returns.
 - Cache the last successful non-secret snapshot locally for offline viewing.
-- Present every returned quota window directly in the menu; do not reduce the
-  interface to a guessed fixed daily or weekly schema.
+- Present the returned `codex` quota directly in the menu. Other technical
+  buckets, including Spark, remain out of the phase-1 interface.
 
 ## Non-goals
 
@@ -25,13 +25,15 @@ five separately authenticated ChatGPT accounts.
 
 ## User-visible behavior
 
-- The menu button opens a compact list of profiles. A profile shows its label,
-  last successful refresh, plan when available, and each returned quota bucket
-  as percent used, percent remaining, its window duration, and reset time.
-- A bucket may be presented as the user-facing `limitName` supplied by Codex.
-  When it is absent, the technical identifier remains visible rather than
-  inventing a label such as “weekly”. A `secondary` window, when returned, is
-  displayed as a separate line under that bucket.
+- The menu button opens a compact list of profiles. A profile shows its email
+  label, plan when available, the remaining percentage for the `codex` primary
+  quota, its next reset as a calendar date and time, and the last successful
+  refresh. The raw used percentage is retained for accessibility only.
+- The visible quota is labelled **Codex**, never “used”, Spark, or a guessed
+  duration such as daily or weekly. `remaining` is `100 - usedPercent`; when
+  no `codex` primary quota is returned, it is shown as unavailable rather than
+  zero. A technical `secondary` window is retained in the cached snapshot but
+  is not shown in the compact phase-1 row.
 - The available earned-reset count is displayed. The app may show the expiry of
   a returned credit, but it must not claim a future replenishment time because
   the documented response does not provide one.
@@ -44,6 +46,32 @@ five separately authenticated ChatGPT accounts.
 - **Refresh all** reads each stored profile independently. A failure leaves the
   last successful snapshot visible and gives that profile a short status.
 - The app never redeems a reset credit; it may display the available count.
+- “Updated” uses whole-minute language (for example, “Updated 2 min ago”) and
+  is refreshed in the interface at most once per minute. It never shows
+  seconds. A reset is shown as a calendar date and time, never an ambiguous
+  multi-day relative duration.
+
+## Snapshot model and state
+
+- For every returned `limitId`, retain the optional `limitName` and plan,
+  server-classified reached state, and every returned primary and secondary
+  window. A window retains its used percentage, duration in minutes, and reset
+  timestamp when each is supplied. Missing fields stay missing; the app does
+  not infer a fixed window name or duration.
+- Earned-reset snapshots retain the authoritative available count and the
+  returned non-secret display details (type, status, grant/expiry timestamps,
+  title, and description). The opaque credit ID is deliberately discarded:
+  phase 1 never redeems a credit. `availableCount` remains authoritative when
+  the service caps the detail rows.
+- Each profile is visibly in exactly one product-language state: **fresh**
+  after a successful refresh, **cached** when an earlier snapshot is retained,
+  **refreshing** while a request is active, **sign-in required** when no usable
+  authentication exists, or **failed** when a refresh without a snapshot
+  fails. A fresh snapshot becomes cached after relaunch until the next
+  successful refresh. A failed refresh never removes the last good snapshot.
+- Persisted failure text is a short, local, redacted category. Raw app-server
+  messages, account payloads, OAuth URLs, and opaque reset-credit IDs are not
+  persisted or shown.
 
 ## Invariants
 
