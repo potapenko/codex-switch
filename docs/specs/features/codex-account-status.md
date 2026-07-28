@@ -29,6 +29,8 @@ five separately authenticated ChatGPT accounts.
   label, plan when available, the remaining percentage for the `codex` primary
   quota, its next reset as a calendar date and time, and the last successful
   refresh. The raw used percentage is retained for accessibility only.
+- The menu-bar button uses the supplied CodexSwitch AppIcon asset, not a
+  system-symbol substitute.
 - The visible quota is labelled **Codex**, never “used”, Spark, or a guessed
   duration such as daily or weekly. `remaining` is `100 - usedPercent`; when
   no `codex` primary quota is returned, it is shown as unavailable rather than
