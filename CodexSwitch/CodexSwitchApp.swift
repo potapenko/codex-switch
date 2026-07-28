@@ -28,9 +28,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         popover.behavior = .transient
 
         let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        let statusIcon = NSImage(named: "AppIcon")
-        statusIcon?.isTemplate = false
-        statusIcon?.size = NSSize(width: 18, height: 18)
+        let statusIcon = NSImage(named: "StatusIcon")
+        statusIcon?.isTemplate = true
+        statusIcon?.size = NSSize(width: 20, height: 20)
         statusItem.button?.image = statusIcon
         statusItem.button?.setAccessibilityLabel("CodexSwitch")
         statusItem.button?.toolTip = "Codex account status"

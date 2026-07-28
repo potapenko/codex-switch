@@ -20,6 +20,24 @@ struct AccountProfile: Codable, Hashable, Identifiable {
         self.snapshotState = snapshotState
         self.lastError = lastError
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case label
+        case snapshot
+        case snapshotState
+        case lastError
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        label = try container.decode(String.self, forKey: .label)
+        snapshot = try container.decodeIfPresent(AccountSnapshot.self, forKey: .snapshot)
+        snapshotState = try container.decodeIfPresent(SnapshotState.self, forKey: .snapshotState)
+            ?? (snapshot == nil ? .signInRequired : .cached)
+        lastError = try container.decodeIfPresent(String.self, forKey: .lastError)
+    }
 }
 
 enum SnapshotState: String, Codable, Hashable {
@@ -36,6 +54,53 @@ struct AccountSnapshot: Codable, Hashable {
     var buckets: [QuotaBucket]
     var resetCredits: ResetCredits?
     var refreshedAt: Date
+
+    private enum CodingKeys: String, CodingKey {
+        case email
+        case plan
+        case buckets
+        case resetCredits
+        case resetCreditCount
+        case refreshedAt
+    }
+
+    init(
+        email: String?,
+        plan: String?,
+        buckets: [QuotaBucket],
+        resetCredits: ResetCredits?,
+        refreshedAt: Date
+    ) {
+        self.email = email
+        self.plan = plan
+        self.buckets = buckets
+        self.resetCredits = resetCredits
+        self.refreshedAt = refreshedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        email = try container.decodeIfPresent(String.self, forKey: .email)
+        plan = try container.decodeIfPresent(String.self, forKey: .plan)
+        buckets = try container.decodeIfPresent([QuotaBucket].self, forKey: .buckets) ?? []
+        if let resetCredits = try container.decodeIfPresent(ResetCredits.self, forKey: .resetCredits) {
+            self.resetCredits = resetCredits
+        } else if let count = try container.decodeIfPresent(Int.self, forKey: .resetCreditCount) {
+            resetCredits = ResetCredits(availableCount: count, details: nil)
+        } else {
+            resetCredits = nil
+        }
+        refreshedAt = try container.decode(Date.self, forKey: .refreshedAt)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(email, forKey: .email)
+        try container.encodeIfPresent(plan, forKey: .plan)
+        try container.encode(buckets, forKey: .buckets)
+        try container.encodeIfPresent(resetCredits, forKey: .resetCredits)
+        try container.encode(refreshedAt, forKey: .refreshedAt)
+    }
 }
 
 struct QuotaBucket: Codable, Hashable, Identifiable {
@@ -44,6 +109,61 @@ struct QuotaBucket: Codable, Hashable, Identifiable {
     var plan: String?
     var reachedType: String?
     var windows: [QuotaWindow]
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case name
+        case plan
+        case reachedType
+        case windows
+        case usedPercent
+        case resetAt
+    }
+
+    init(
+        id: String,
+        name: String?,
+        plan: String?,
+        reachedType: String?,
+        windows: [QuotaWindow]
+    ) {
+        self.id = id
+        self.name = name
+        self.plan = plan
+        self.reachedType = reachedType
+        self.windows = windows
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        plan = try container.decodeIfPresent(String.self, forKey: .plan)
+        reachedType = try container.decodeIfPresent(String.self, forKey: .reachedType)
+
+        if let windows = try container.decodeIfPresent([QuotaWindow].self, forKey: .windows) {
+            self.windows = windows
+        } else if let usedPercent = try container.decodeIfPresent(Double.self, forKey: .usedPercent) {
+            let resetAt = try container.decodeIfPresent(Date.self, forKey: .resetAt)
+            windows = [QuotaWindow(
+                kind: .primary,
+                usedPercent: usedPercent,
+                windowDurationMinutes: nil,
+                resetAt: resetAt
+            )]
+        } else {
+            windows = []
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encodeIfPresent(name, forKey: .name)
+        try container.encodeIfPresent(plan, forKey: .plan)
+        try container.encodeIfPresent(reachedType, forKey: .reachedType)
+        try container.encode(windows, forKey: .windows)
+    }
 }
 
 struct QuotaWindow: Codable, Hashable, Identifiable {

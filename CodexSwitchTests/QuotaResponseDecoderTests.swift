@@ -66,4 +66,29 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertEqual(QuotaPresentation.updatedText(for: now, now: now.addingTimeInterval(61)), "Updated 1 min ago")
         XCTAssertEqual(QuotaPresentation.updatedText(for: now, now: now.addingTimeInterval(181)), "Updated 3 min ago")
     }
+
+    func testDecodesProfilesPersistedWithThePreviousQuotaSchema() throws {
+        let persistedProfiles = Data(#"""
+        [{
+          "id":"D0E1F2A3-B4C5-4678-9012-3456789ABCDE",
+          "label":"Existing account",
+          "snapshot":{
+            "email":"account@example.test",
+            "plan":"pro",
+            "buckets":[{"id":"codex","name":"Codex","usedPercent":25,"resetAt":200}],
+            "resetCreditCount":2,
+            "refreshedAt":100
+          },
+          "lastError":null
+        }]
+        """#.utf8)
+
+        let profile = try XCTUnwrap(JSONDecoder().decode([AccountProfile].self, from: persistedProfiles).first)
+
+        XCTAssertEqual(profile.snapshotState, .cached)
+        XCTAssertEqual(profile.snapshot?.buckets.first?.windows.first?.kind, .primary)
+        XCTAssertEqual(profile.snapshot?.buckets.first?.windows.first?.usedPercent, 25)
+        XCTAssertEqual(profile.snapshot?.buckets.first?.windows.first?.resetAt, Date(timeIntervalSinceReferenceDate: 200))
+        XCTAssertEqual(profile.snapshot?.resetCredits?.availableCount, 2)
+    }
 }
