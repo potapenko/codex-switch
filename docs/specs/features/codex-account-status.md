@@ -94,6 +94,8 @@ five separately authenticated ChatGPT accounts.
   removes only that profile's local dashboard metadata and cached snapshot from
   the visible list. It never reads, deletes, or changes the profile's isolated
   `CODEX_HOME`, OAuth credentials, or any other Codex authentication state.
+  The action remains available during a refresh; any already-running refresh
+  for the removed profile discards its later result.
 - Opening the menu starts one **Refresh all** operation before the owner reads
   the rows, so the menu normally presents the latest available state. This is
   an on-open refresh, not background polling; repeated opening while a refresh

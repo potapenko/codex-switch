@@ -34,7 +34,6 @@ final class AppState {
     }
 
     func removeAccount(profileID: UUID) {
-        guard !isRefreshing else { return }
         profiles.removeAll { $0.id == profileID }
         persist()
     }

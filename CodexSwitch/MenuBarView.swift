@@ -110,7 +110,6 @@ private struct ProfileRow: View {
                 Spacer()
                 if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }
                 Button("Remove", role: .destructive, action: remove)
-                    .disabled(isRefreshing)
             }
             if let snapshot = profile.snapshot {
                 if let primary = codexPrimaryWindow(in: snapshot), let usedPercent = primary.usedPercent {
