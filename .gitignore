@@ -1,0 +1,12 @@
+.DS_Store
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+*.xcresult
+dist/
+*.app
+*.dSYM
+.swiftpm/
+.build/
+CodexSwitch.xcodeproj/project.xcworkspace/xcuserdata/

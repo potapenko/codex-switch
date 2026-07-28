@@ -1,0 +1,433 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0E65720D0B05F74E0AA9DC55 /* CodexAppServerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D84046F76434C375539E35 /* CodexAppServerClient.swift */; };
+		2C375FAEB88F13787055ECA4 /* CodexSwitchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */; };
+		534396843460D1119A27F748 /* QuotaResponseDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1C669C77572CC6FD2173B /* QuotaResponseDecoder.swift */; };
+		5C359AF5093B79E825974822 /* QuotaResponseDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3E24947F642C71BB4DB97B6 /* QuotaResponseDecoderTests.swift */; };
+		6AA91AACEFB0032619B8E986 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB05FBB5C68CBE6684FA84CD /* AppState.swift */; };
+		8F535E3D0074F9ED1CE24DC5 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */; };
+		B44CF9B2DD03CA58DD9C5376 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA28229B1C67D389AD860B4 /* MenuBarView.swift */; };
+		F21612A890AB334B94E7AE8A /* AccountProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AD995E8B3F3E419AB183 /* AccountProfile.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4B14E022B9C52C0F6C5E6552 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0A128EAE1A43C6C1591CD781 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85EB48779D250F7CE8901C1B;
+			remoteInfo = CodexSwitch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1F051BB61E1EE422F2478113 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
+		A3E24947F642C71BB4DB97B6 /* QuotaResponseDecoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaResponseDecoderTests.swift; sourceTree = "<group>"; };
+		A5C7AD995E8B3F3E419AB183 /* AccountProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfile.swift; sourceTree = "<group>"; };
+		B7E1C669C77572CC6FD2173B /* QuotaResponseDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaResponseDecoder.swift; sourceTree = "<group>"; };
+		BAA28229B1C67D389AD860B4 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexSwitchApp.swift; sourceTree = "<group>"; };
+		D7D84046F76434C375539E35 /* CodexAppServerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexAppServerClient.swift; sourceTree = "<group>"; };
+		DF6F569F8B841E975AAD46CE /* CodexSwitchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodexSwitchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7976CE1C4CD47F46DB4FDA1 /* CodexSwitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexSwitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EB05FBB5C68CBE6684FA84CD /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		626C9F519FEF3C1DFD2DFC6F = {
+			isa = PBXGroup;
+			children = (
+				E52820D3565E4DEE61C14242 /* CodexSwitch */,
+				6D55F04A727CB42E80E1C298 /* CodexSwitchTests */,
+				B1407552BD77DB66CEA6973A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6D55F04A727CB42E80E1C298 /* CodexSwitchTests */ = {
+			isa = PBXGroup;
+			children = (
+				A3E24947F642C71BB4DB97B6 /* QuotaResponseDecoderTests.swift */,
+			);
+			path = CodexSwitchTests;
+			sourceTree = "<group>";
+		};
+		7E18AE8150A6F5FDB3B47480 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A5C7AD995E8B3F3E419AB183 /* AccountProfile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		B1407552BD77DB66CEA6973A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E7976CE1C4CD47F46DB4FDA1 /* CodexSwitch.app */,
+				DF6F569F8B841E975AAD46CE /* CodexSwitchTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C4AC2198B6F5702818CFD5E7 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				D7D84046F76434C375539E35 /* CodexAppServerClient.swift */,
+				9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */,
+				B7E1C669C77572CC6FD2173B /* QuotaResponseDecoder.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		E52820D3565E4DEE61C14242 /* CodexSwitch */ = {
+			isa = PBXGroup;
+			children = (
+				EB05FBB5C68CBE6684FA84CD /* AppState.swift */,
+				C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */,
+				1F051BB61E1EE422F2478113 /* Info.plist */,
+				BAA28229B1C67D389AD860B4 /* MenuBarView.swift */,
+				7E18AE8150A6F5FDB3B47480 /* Models */,
+				C4AC2198B6F5702818CFD5E7 /* Services */,
+			);
+			path = CodexSwitch;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A09B1DCF915C68CC8FA0C72 /* CodexSwitchTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D390001FB8A15542DDC1B759 /* Build configuration list for PBXNativeTarget "CodexSwitchTests" */;
+			buildPhases = (
+				A5A3ED2AD32B5939461084A2 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C8D20B32F8EC2F6B9FEB626 /* PBXTargetDependency */,
+			);
+			name = CodexSwitchTests;
+			packageProductDependencies = (
+			);
+			productName = CodexSwitchTests;
+			productReference = DF6F569F8B841E975AAD46CE /* CodexSwitchTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		85EB48779D250F7CE8901C1B /* CodexSwitch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 827BBEDE55EF04F49CC84CF7 /* Build configuration list for PBXNativeTarget "CodexSwitch" */;
+			buildPhases = (
+				71ACE4EB0BD5F2D3E155CD86 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CodexSwitch;
+			packageProductDependencies = (
+			);
+			productName = CodexSwitch;
+			productReference = E7976CE1C4CD47F46DB4FDA1 /* CodexSwitch.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0A128EAE1A43C6C1591CD781 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					6A09B1DCF915C68CC8FA0C72 = {
+						DevelopmentTeam = "";
+					};
+					85EB48779D250F7CE8901C1B = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = 9CD3F81AEDC37F284F5509E8 /* Build configuration list for PBXProject "CodexSwitch" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 626C9F519FEF3C1DFD2DFC6F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = B1407552BD77DB66CEA6973A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				85EB48779D250F7CE8901C1B /* CodexSwitch */,
+				6A09B1DCF915C68CC8FA0C72 /* CodexSwitchTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		71ACE4EB0BD5F2D3E155CD86 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F21612A890AB334B94E7AE8A /* AccountProfile.swift in Sources */,
+				6AA91AACEFB0032619B8E986 /* AppState.swift in Sources */,
+				0E65720D0B05F74E0AA9DC55 /* CodexAppServerClient.swift in Sources */,
+				2C375FAEB88F13787055ECA4 /* CodexSwitchApp.swift in Sources */,
+				B44CF9B2DD03CA58DD9C5376 /* MenuBarView.swift in Sources */,
+				8F535E3D0074F9ED1CE24DC5 /* ProfileStore.swift in Sources */,
+				534396843460D1119A27F748 /* QuotaResponseDecoder.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5A3ED2AD32B5939461084A2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C359AF5093B79E825974822 /* QuotaResponseDecoderTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0C8D20B32F8EC2F6B9FEB626 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85EB48779D250F7CE8901C1B /* CodexSwitch */;
+			targetProxy = 4B14E022B9C52C0F6C5E6552 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0EC8C599F4D8AFA55E2C46FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		36BEB11CB163B1EFEF630836 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CodexSwitch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eugenepotapenko.CodexSwitch;
+				PRODUCT_NAME = CodexSwitch;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		5CA05EF5D20933FD214CABD4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		90195A772A8F583C102B79D3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eugenepotapenko.CodexSwitchTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexSwitch.app/Contents/MacOS/CodexSwitch";
+			};
+			name = Release;
+		};
+		9E652B358AE3DDFEFA368396 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eugenepotapenko.CodexSwitchTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexSwitch.app/Contents/MacOS/CodexSwitch";
+			};
+			name = Debug;
+		};
+		E68E9F801C74286D84C7E430 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = CodexSwitch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.eugenepotapenko.CodexSwitch;
+				PRODUCT_NAME = CodexSwitch;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		827BBEDE55EF04F49CC84CF7 /* Build configuration list for PBXNativeTarget "CodexSwitch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36BEB11CB163B1EFEF630836 /* Debug */,
+				E68E9F801C74286D84C7E430 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9CD3F81AEDC37F284F5509E8 /* Build configuration list for PBXProject "CodexSwitch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5CA05EF5D20933FD214CABD4 /* Debug */,
+				0EC8C599F4D8AFA55E2C46FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D390001FB8A15542DDC1B759 /* Build configuration list for PBXNativeTarget "CodexSwitchTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9E652B358AE3DDFEFA368396 /* Debug */,
+				90195A772A8F583C102B79D3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0A128EAE1A43C6C1591CD781 /* Project object */;
+}
