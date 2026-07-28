@@ -2,12 +2,12 @@
 
 ## Goal
 
-Give the owner a quick, local menu-bar view of the Codex quota state for up to
-five separately authenticated ChatGPT accounts.
+Give the owner a quick, local menu-bar view of the Codex quota state for their
+separately authenticated ChatGPT accounts.
 
 ## Scope
 
-- Add up to five named local profiles.
+- Add any number of named local profiles.
 - Start a browser sign-in through the locally installed `codex app-server`.
 - Read the account identity/plan and the quota buckets, reset times, and
   available earned-reset credits that the app-server returns.
@@ -35,6 +35,9 @@ five separately authenticated ChatGPT accounts.
   another profile to place it before that row. The chosen order is saved with
   the local dashboard metadata and has no effect on authentication, refreshes,
   or reported quota values.
+- The profile rows occupy a bounded, vertically scrollable area when they no
+  longer fit in the popover. The header and **Add account** control stay
+  visible, and no profile-count limit is imposed.
 - An eye control in the menu header toggles a local share view. While enabled,
   each visible email label is replaced by its current list position (`Account
   1`, `Account 2`, and so on) or an optional owner-provided account name. Only
@@ -74,11 +77,9 @@ five separately authenticated ChatGPT accounts.
   running Codex or ChatGPT desktop session. Account/session switching is not a
   planned CodexSwitch feature.
 - **Add account** is always an enabled control, including while existing
-  profiles refresh and when the five-profile limit has been reached. It starts
-  a normal browser login when capacity is available. At the limit, selecting it
-  presents a short explanation that one existing profile must be removed before
-  another can be added. After a successful login, the app refreshes the profile
-  and replaces its provisional label with the returned email when available.
+  profiles refresh. It starts a normal browser login. After a successful login,
+  the app refreshes the profile and replaces its provisional label with the
+  returned email when available.
 - **Refresh all** reads each stored profile independently. A failure leaves the
   last successful snapshot visible and gives that profile a short status.
 - A failed or cached profile exposes a per-row **Retry** action. It refreshes
@@ -136,7 +137,6 @@ five separately authenticated ChatGPT accounts.
 
 ## Invariants
 
-- At most five profiles exist.
 - Profile metadata and cached snapshots contain no token or OAuth URL.
 - Every profile has an isolated application-support directory passed only to
   its child `codex app-server` as `CODEX_HOME`.
@@ -154,6 +154,6 @@ five separately authenticated ChatGPT accounts.
 
 ## Verification mapping
 
-- Unit tests cover persisted profile limits and returned-quota decoding.
+- Unit tests cover profile persistence and returned-quota decoding.
 - `xcodebuild ... test` covers the build/test gate.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.

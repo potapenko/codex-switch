@@ -5,7 +5,7 @@ was cancelled by the owner on 2026-07-28.
 
 This is the governing plan for a single product track:
 
-1. a menu-bar-only read-only dashboard for up to five Codex/ChatGPT accounts.
+1. a menu-bar-only read-only dashboard for any number of Codex/ChatGPT accounts.
 
 CodexSwitch will not implement account/session switching, launch or terminate
 Desktop Codex, or handle authentication-profile files. Future work is limited
@@ -260,8 +260,8 @@ that mode for the switcher.
 2. Make remaining/quota/reset semantics accessible through VoiceOver labels.
 3. Add per-row refresh and error recovery. Keep any automatic refresh off by
    default.
-4. Add local label editing and profile capacity behavior, while keeping the
-   maximum of five explicit in the UI.
+4. Add local label editing, profile ordering, and a bounded scrollable list
+   for an unbounded number of profiles.
 
 ### Milestone C — visual identity
 

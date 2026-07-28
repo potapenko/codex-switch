@@ -13,7 +13,6 @@ final class AppState {
     }
 
     func addAccount() async {
-        guard profiles.count < 5 else { return }
         let profile = AccountProfile()
         profiles.append(profile)
         persist()

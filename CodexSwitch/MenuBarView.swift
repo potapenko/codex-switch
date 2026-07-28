@@ -3,7 +3,6 @@ import SwiftUI
 struct MenuBarView: View {
     @Bindable var appState: AppState
     @State private var areEmailsMasked = false
-    @State private var isProfileLimitAlertPresented = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -29,59 +28,49 @@ struct MenuBarView: View {
                 ContentUnavailableView("No accounts", systemImage: "person.crop.circle.badge.plus", description: Text("Add a ChatGPT account to view its Codex quotas."))
                     .frame(width: 320, height: 150)
             } else {
-                ForEach(Array(appState.profiles.enumerated()), id: \.element.id) { entry in
-                    let profile = entry.element
-                    ProfileRow(
-                        profile: profile,
-                        displayName: areEmailsMasked
-                            ? profile.maskedDisplayName(fallback: "Account \(entry.offset + 1)")
-                            : profile.label,
-                        areEmailsMasked: areEmailsMasked,
-                        isRefreshing: appState.isRefreshing,
-                        remove: {
-                            appState.removeAccount(profileID: profile.id)
-                        },
-                        retry: {
-                            Task { await appState.retry(profileID: profile.id) }
-                        },
-                        saveNickname: { nickname in
-                            appState.updateNickname(nickname, for: profile.id)
+                ScrollView(.vertical) {
+                    LazyVStack(alignment: .leading, spacing: 12) {
+                        ForEach(Array(appState.profiles.enumerated()), id: \.element.id) { entry in
+                            let profile = entry.element
+                            ProfileRow(
+                                profile: profile,
+                                displayName: areEmailsMasked
+                                    ? profile.maskedDisplayName(fallback: "Account \(entry.offset + 1)")
+                                    : profile.label,
+                                areEmailsMasked: areEmailsMasked,
+                                isRefreshing: appState.isRefreshing,
+                                remove: {
+                                    appState.removeAccount(profileID: profile.id)
+                                },
+                                retry: {
+                                    Task { await appState.retry(profileID: profile.id) }
+                                },
+                                saveNickname: { nickname in
+                                    appState.updateNickname(nickname, for: profile.id)
+                                }
+                            )
+                            .dropDestination(for: String.self) { droppedProfileIDs, _ in
+                                guard let droppedProfileID = droppedProfileIDs.first,
+                                      let profileID = UUID(uuidString: droppedProfileID) else {
+                                    return false
+                                }
+                                appState.moveAccount(profileID: profileID, before: profile.id)
+                                return true
+                            }
+                            if profile.id != appState.profiles.last?.id { Divider() }
                         }
-                    )
-                    .dropDestination(for: String.self) { droppedProfileIDs, _ in
-                        guard let droppedProfileID = droppedProfileIDs.first,
-                              let profileID = UUID(uuidString: droppedProfileID) else {
-                            return false
-                        }
-                        appState.moveAccount(profileID: profileID, before: profile.id)
-                        return true
                     }
-                    if profile.id != appState.profiles.last?.id { Divider() }
                 }
+                .frame(maxHeight: 620)
             }
 
             Divider()
             Button("Add account") {
-                if appState.profiles.count >= 5 {
-                    isProfileLimitAlertPresented = true
-                } else {
-                    Task { await appState.addAccount() }
-                }
-            }
-
-            if appState.profiles.count >= 5 {
-                Text("Five profiles is the first-release limit.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                Task { await appState.addAccount() }
             }
         }
         .padding(14)
         .frame(width: 360)
-        .alert("Five profile limit", isPresented: $isProfileLimitAlertPresented) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text("Remove an existing account before adding another one.")
-        }
     }
 }
 

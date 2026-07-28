@@ -135,6 +135,18 @@ final class QuotaResponseDecoderTests: XCTestCase {
         )
     }
 
+    func testProfilePersistenceSupportsMoreThanFiveAccounts() throws {
+        let profiles = (1...6).map { AccountProfile(label: "Account \($0)") }
+
+        let decodedProfiles = try JSONDecoder().decode(
+            [AccountProfile].self,
+            from: JSONEncoder().encode(profiles)
+        )
+
+        XCTAssertEqual(decodedProfiles.count, 6)
+        XCTAssertEqual(decodedProfiles.map(\.label), profiles.map(\.label))
+    }
+
     func testResetCreditBadgeKeepsZeroVisibleAndAccentsAvailableCredits() {
         let noCredits = ResetCredits(availableCount: 0, details: nil)
         let availableCredits = ResetCredits(availableCount: 1, details: nil)
