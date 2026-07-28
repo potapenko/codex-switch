@@ -45,6 +45,10 @@ five separately authenticated ChatGPT accounts.
   email when available.
 - **Refresh all** reads each stored profile independently. A failure leaves the
   last successful snapshot visible and gives that profile a short status.
+- Opening the menu starts one **Refresh all** operation before the owner reads
+  the rows, so the menu normally presents the latest available state. This is
+  an on-open refresh, not background polling; repeated opening while a refresh
+  is already running does not start a duplicate operation.
 - The app never redeems a reset credit; it may display the available count.
 - “Updated” uses whole-minute language (for example, “Updated 2 min ago”) and
   is refreshed in the interface at most once per minute. It never shows

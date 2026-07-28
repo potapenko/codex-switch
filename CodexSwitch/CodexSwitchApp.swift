@@ -35,15 +35,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.sendAction(on: [.leftMouseUp])
         self.statusItem = statusItem
 
-        Task {
-            await appState.refreshAll()
-        }
     }
 
     @objc private func togglePopover(_ sender: NSStatusBarButton) {
         if popover.isShown {
             popover.performClose(nil)
         } else {
+            Task {
+                await appState.refreshAll()
+            }
             popover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
         }
     }
