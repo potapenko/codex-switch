@@ -45,7 +45,9 @@ controlled tests below pass.
 4. Exercise cancellation, confirmed hard switch, termination timeout,
    replacement launch failure, expired login, and an active Codex task.
    Verify that accepted switching closes only the confirmed `ChatGPT` root
-   process, waits for exit, and then launches the replacement.
+   process, waits for exit, and then launches the replacement. For an empty
+   profile, verify that Desktop presents its own normal registration/sign-in
+   flow rather than inheriting or importing credentials.
 
 ## Guardrails for the remaining spike
 
@@ -53,6 +55,8 @@ controlled tests below pass.
 - Do not copy a whole profile home or selected “identity” files. OAuth tokens,
   `auth.json`, and Keychain items are credentials and must remain in the
   profile where Codex created them.
+- Do not add a credential-export or “save identity files” control. Missing
+  authentication state is handled by Desktop Codex's normal sign-in flow.
 - Do not inspect process arguments or environment variables.
 - Do not use a broad process matcher such as `pkill codex`.
 - Keep only this redacted report and the visible identity/result summary; do

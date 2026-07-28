@@ -163,6 +163,13 @@ instance with the selected profile's existing isolated local state. It shows
 `Switching…` until the new Desktop window's visible identity and
 `account/read` agree for the selected profile.
 
+A profile with no local authentication state is still switchable. Its empty
+isolated paths are passed to the new Desktop instance; Codex itself presents
+its normal sign-in or registration flow. There is no “save identity files” or
+credential-export control in CodexSwitch. Once the owner completes sign-in,
+CodexSwitch refreshes the profile through its local app-server and waits for
+the visible identity to agree.
+
 This is a replacement workflow, not a separate-window or focus workflow. The
 owner's confirmation intentionally authorizes closing active Codex work.
 
@@ -173,6 +180,9 @@ owner's confirmation intentionally authorizes closing active Codex work.
 - Select the pre-existing profile directories by path; never copy either a
   whole `CODEX_HOME` or selected “identity” files between profiles or into the
   normal/default home.
+- Treat missing authentication state as **sign-in required**, not as a reason
+  to import or clone credentials. The Desktop app owns its normal registration
+  and sign-in flow inside that profile's isolated paths.
 - Terminate only the user-confirmed Desktop Codex target after the
   **Switch and restart Codex** confirmation. Never use a broad `pkill codex`
   or target CodexSwitch-owned `codex app-server` children.
@@ -204,7 +214,8 @@ Codex and ChatGPT/Codex Desktop versions:
    task. Confirm cancellation leaves Desktop Codex untouched; confirm an
    accepted hard switch closes the confirmed Desktop Codex workload, launches
    the replacement only after exit, and never targets non-Desktop Codex
-   processes.
+   processes. Also confirm an empty profile reaches Codex's normal sign-in or
+   registration flow without importing any credentials.
 6. Record only redacted, human-readable outcomes and paths; do not retain
    token-bearing files or logs.
 
