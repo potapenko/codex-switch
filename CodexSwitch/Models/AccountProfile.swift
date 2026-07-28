@@ -49,6 +49,10 @@ struct AccountProfile: Codable, Hashable, Identifiable {
         nickname = trimmed.isEmpty ? nil : trimmed
     }
 
+    func maskedDisplayName(fallback: String) -> String {
+        nickname ?? fallback
+    }
+
     var supportsRetry: Bool {
         snapshotState == .cached || snapshotState == .failed
     }

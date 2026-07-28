@@ -32,7 +32,9 @@ struct MenuBarView: View {
                     let profile = entry.element
                     ProfileRow(
                         profile: profile,
-                        displayName: areEmailsMasked ? "Account \(entry.offset + 1)" : profile.label,
+                        displayName: areEmailsMasked
+                            ? profile.maskedDisplayName(fallback: "Account \(entry.offset + 1)")
+                            : profile.label,
                         areEmailsMasked: areEmailsMasked,
                         isRefreshing: appState.isRefreshing,
                         remove: {
@@ -83,25 +85,12 @@ private struct ProfileRow: View {
                 profileName
                 Spacer()
                 if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }
-                if !areEmailsMasked {
-                    Button {
-                        nicknameDraft = profile.nickname ?? ""
-                        isEditingNickname = true
-                    } label: {
-                        Image(systemName: "pencil")
-                    }
-                    .buttonStyle(.borderless)
-                    .disabled(isRefreshing)
-                    .help("Edit local nickname")
-                    .accessibilityLabel("Edit local nickname")
-                }
                 Button("Remove", role: .destructive, action: remove)
                     .disabled(isRefreshing)
             }
-            if isEditingNickname {
+            if areEmailsMasked && isEditingNickname {
                 HStack {
-                    TextField("Local nickname", text: $nicknameDraft)
-                    Button("Save") {
+                    Button("Save private name") {
                         saveNickname(nicknameDraft)
                         isEditingNickname = false
                     }
@@ -117,7 +106,6 @@ private struct ProfileRow: View {
                         isEditingNickname = false
                     }
                 }
-                .textFieldStyle(.roundedBorder)
             }
             if let snapshot = profile.snapshot {
                 if let primary = codexPrimaryWindow(in: snapshot), let usedPercent = primary.usedPercent {
@@ -154,16 +142,31 @@ private struct ProfileRow: View {
                 }
             }
         }
+        .onChange(of: areEmailsMasked) { _, isMasked in
+            if !isMasked {
+                isEditingNickname = false
+            }
+        }
     }
 
     @ViewBuilder
     private var profileName: some View {
         if areEmailsMasked {
-            Text(displayName).fontWeight(.medium)
-        } else if let nickname = profile.nickname {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(nickname).fontWeight(.medium)
-                Text(profile.label).font(.footnote).foregroundStyle(.secondary)
+            if isEditingNickname {
+                TextField("Private account name", text: $nicknameDraft)
+                    .textFieldStyle(.roundedBorder)
+                    .accessibilityLabel("Private account name")
+            } else {
+                Button {
+                    nicknameDraft = profile.nickname ?? ""
+                    isEditingNickname = true
+                } label: {
+                    Text(displayName).fontWeight(.medium)
+                }
+                .buttonStyle(.plain)
+                .disabled(isRefreshing)
+                .help("Edit private account name")
+                .accessibilityLabel("Edit private account name: \(displayName)")
             }
         } else {
             Text(displayName).fontWeight(.medium)

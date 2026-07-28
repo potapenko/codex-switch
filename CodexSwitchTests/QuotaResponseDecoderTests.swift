@@ -98,7 +98,7 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertNil(profile.nickname)
     }
 
-    func testNicknameIsLocalAndRoundTripsWithoutReplacingEmailLabel() throws {
+    func testPrivateNameIsLocalAndOnlyChangesTheMaskedDisplayName() throws {
         var profile = AccountProfile(label: "account@example.test")
 
         profile.setNickname("  Work account  ")
@@ -106,9 +106,11 @@ final class QuotaResponseDecoderTests: XCTestCase {
 
         XCTAssertEqual(decoded.label, "account@example.test")
         XCTAssertEqual(decoded.nickname, "Work account")
+        XCTAssertEqual(decoded.maskedDisplayName(fallback: "Account 1"), "Work account")
 
         profile.setNickname("   ")
         XCTAssertNil(profile.nickname)
+        XCTAssertEqual(profile.maskedDisplayName(fallback: "Account 1"), "Account 1")
     }
 
     func testCachedAndFailedProfilesSupportRetryWithoutAnErrorMessage() {
