@@ -58,6 +58,15 @@ five separately authenticated ChatGPT accounts.
   email when available.
 - **Refresh all** reads each stored profile independently. A failure leaves the
   last successful snapshot visible and gives that profile a short status.
+- A failed or cached profile exposes a per-row **Retry** action. It refreshes
+  only that profile and never removes its last good snapshot. A retry has no
+  account-switching side effect.
+- The owner can assign an optional local nickname to a profile. In the normal
+  view its returned email remains visible for recognition; the nickname is a
+  local display aid only. The share view still shows `Account 1`, `Account 2`,
+  and so on, instead of either email or nickname. Editing or clearing a
+  nickname never changes `CODEX_HOME`, OAuth credentials, or what a later
+  refresh reports as the account email.
 - Every account row includes a destructive **Remove account** action. It
   removes only that profile's local dashboard metadata and cached snapshot from
   the visible list. It never reads, deletes, or changes the profile's isolated

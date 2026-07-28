@@ -3,6 +3,7 @@ import Foundation
 struct AccountProfile: Codable, Hashable, Identifiable {
     let id: UUID
     var label: String
+    var nickname: String?
     var snapshot: AccountSnapshot?
     var snapshotState: SnapshotState
     var lastError: String?
@@ -10,12 +11,14 @@ struct AccountProfile: Codable, Hashable, Identifiable {
     init(
         id: UUID = UUID(),
         label: String = "New account",
+        nickname: String? = nil,
         snapshot: AccountSnapshot? = nil,
         snapshotState: SnapshotState = .signInRequired,
         lastError: String? = nil
     ) {
         self.id = id
         self.label = label
+        self.nickname = nickname
         self.snapshot = snapshot
         self.snapshotState = snapshotState
         self.lastError = lastError
@@ -24,6 +27,7 @@ struct AccountProfile: Codable, Hashable, Identifiable {
     private enum CodingKeys: String, CodingKey {
         case id
         case label
+        case nickname
         case snapshot
         case snapshotState
         case lastError
@@ -33,10 +37,16 @@ struct AccountProfile: Codable, Hashable, Identifiable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
         label = try container.decode(String.self, forKey: .label)
+        nickname = try container.decodeIfPresent(String.self, forKey: .nickname)
         snapshot = try container.decodeIfPresent(AccountSnapshot.self, forKey: .snapshot)
         snapshotState = try container.decodeIfPresent(SnapshotState.self, forKey: .snapshotState)
             ?? (snapshot == nil ? .signInRequired : .cached)
         lastError = try container.decodeIfPresent(String.self, forKey: .lastError)
+    }
+
+    mutating func setNickname(_ value: String) {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        nickname = trimmed.isEmpty ? nil : trimmed
     }
 }
 

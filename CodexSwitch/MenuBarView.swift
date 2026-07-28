@@ -33,10 +33,18 @@ struct MenuBarView: View {
                     ProfileRow(
                         profile: profile,
                         displayName: areEmailsMasked ? "Account \(entry.offset + 1)" : profile.label,
-                        canRemove: !appState.isRefreshing
-                    ) {
-                        appState.removeAccount(profileID: profile.id)
-                    }
+                        areEmailsMasked: areEmailsMasked,
+                        isRefreshing: appState.isRefreshing,
+                        remove: {
+                            appState.removeAccount(profileID: profile.id)
+                        },
+                        retry: {
+                            Task { await appState.retry(profileID: profile.id) }
+                        },
+                        saveNickname: { nickname in
+                            appState.updateNickname(nickname, for: profile.id)
+                        }
+                    )
                     if profile.id != appState.profiles.last?.id { Divider() }
                 }
             }
@@ -61,17 +69,55 @@ struct MenuBarView: View {
 private struct ProfileRow: View {
     let profile: AccountProfile
     let displayName: String
-    let canRemove: Bool
+    let areEmailsMasked: Bool
+    let isRefreshing: Bool
     let remove: () -> Void
+    let retry: () -> Void
+    let saveNickname: (String) -> Void
+    @State private var isEditingNickname = false
+    @State private var nicknameDraft = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
-                Text(displayName).fontWeight(.medium)
+                profileName
                 Spacer()
                 if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }
+                if !areEmailsMasked {
+                    Button {
+                        nicknameDraft = profile.nickname ?? ""
+                        isEditingNickname = true
+                    } label: {
+                        Image(systemName: "pencil")
+                    }
+                    .buttonStyle(.borderless)
+                    .disabled(isRefreshing)
+                    .help("Edit local nickname")
+                    .accessibilityLabel("Edit local nickname")
+                }
                 Button("Remove", role: .destructive, action: remove)
-                    .disabled(!canRemove)
+                    .disabled(isRefreshing)
+            }
+            if isEditingNickname {
+                HStack {
+                    TextField("Local nickname", text: $nicknameDraft)
+                    Button("Save") {
+                        saveNickname(nicknameDraft)
+                        isEditingNickname = false
+                    }
+                    .disabled(isRefreshing)
+                    if profile.nickname != nil {
+                        Button("Clear") {
+                            saveNickname("")
+                            isEditingNickname = false
+                        }
+                        .disabled(isRefreshing)
+                    }
+                    Button("Cancel") {
+                        isEditingNickname = false
+                    }
+                }
+                .textFieldStyle(.roundedBorder)
             }
             if let snapshot = profile.snapshot {
                 if let primary = codexPrimaryWindow(in: snapshot), let usedPercent = primary.usedPercent {
@@ -93,9 +139,34 @@ private struct ProfileRow: View {
                 Text(statusText).font(.footnote).foregroundStyle(.secondary)
             }
             if let error = profile.lastError {
-                Text(error).font(.footnote).foregroundStyle(.red)
+                HStack {
+                    Text(error).font(.footnote).foregroundStyle(.red)
+                    Spacer()
+                    if canRetry {
+                        Button("Retry", action: retry)
+                            .buttonStyle(.borderless)
+                    }
+                }
             }
         }
+    }
+
+    @ViewBuilder
+    private var profileName: some View {
+        if areEmailsMasked {
+            Text(displayName).fontWeight(.medium)
+        } else if let nickname = profile.nickname {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(nickname).fontWeight(.medium)
+                Text(profile.label).font(.footnote).foregroundStyle(.secondary)
+            }
+        } else {
+            Text(displayName).fontWeight(.medium)
+        }
+    }
+
+    private var canRetry: Bool {
+        !isRefreshing && (profile.snapshotState == .cached || profile.snapshotState == .failed)
     }
 
     private var statusText: String {

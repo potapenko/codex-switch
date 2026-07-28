@@ -90,5 +90,19 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertEqual(profile.snapshot?.buckets.first?.windows.first?.usedPercent, 25)
         XCTAssertEqual(profile.snapshot?.buckets.first?.windows.first?.resetAt, Date(timeIntervalSinceReferenceDate: 200))
         XCTAssertEqual(profile.snapshot?.resetCredits?.availableCount, 2)
+        XCTAssertNil(profile.nickname)
+    }
+
+    func testNicknameIsLocalAndRoundTripsWithoutReplacingEmailLabel() throws {
+        var profile = AccountProfile(label: "account@example.test")
+
+        profile.setNickname("  Work account  ")
+        let decoded = try JSONDecoder().decode(AccountProfile.self, from: JSONEncoder().encode(profile))
+
+        XCTAssertEqual(decoded.label, "account@example.test")
+        XCTAssertEqual(decoded.nickname, "Work account")
+
+        profile.setNickname("   ")
+        XCTAssertNil(profile.nickname)
     }
 }

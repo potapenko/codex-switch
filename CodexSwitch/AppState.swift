@@ -39,6 +39,20 @@ final class AppState {
         persist()
     }
 
+    func updateNickname(_ nickname: String, for profileID: UUID) {
+        guard !isRefreshing else { return }
+        update(profileID: profileID) {
+            $0.setNickname(nickname)
+        }
+    }
+
+    func retry(profileID: UUID) async {
+        guard !isRefreshing, let profile = profiles.first(where: { $0.id == profileID }) else { return }
+        isRefreshing = true
+        defer { isRefreshing = false }
+        await refresh(profile: profile)
+    }
+
     private func loginAndRefresh(profile: AccountProfile) async throws {
         update(profileID: profile.id) {
             $0.snapshotState = .refreshing
