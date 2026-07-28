@@ -105,4 +105,11 @@ final class QuotaResponseDecoderTests: XCTestCase {
         profile.setNickname("   ")
         XCTAssertNil(profile.nickname)
     }
+
+    func testCachedAndFailedProfilesSupportRetryWithoutAnErrorMessage() {
+        XCTAssertFalse(AccountProfile(snapshotState: .fresh).supportsRetry)
+        XCTAssertTrue(AccountProfile(snapshotState: .cached).supportsRetry)
+        XCTAssertTrue(AccountProfile(snapshotState: .failed).supportsRetry)
+        XCTAssertFalse(AccountProfile(snapshotState: .signInRequired).supportsRetry)
+    }
 }

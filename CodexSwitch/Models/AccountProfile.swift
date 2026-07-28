@@ -48,6 +48,10 @@ struct AccountProfile: Codable, Hashable, Identifiable {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         nickname = trimmed.isEmpty ? nil : trimmed
     }
+
+    var supportsRetry: Bool {
+        snapshotState == .cached || snapshotState == .failed
+    }
 }
 
 enum SnapshotState: String, Codable, Hashable {

@@ -139,13 +139,13 @@ private struct ProfileRow: View {
                 Text(statusText).font(.footnote).foregroundStyle(.secondary)
             }
             if let error = profile.lastError {
+                Text(error).font(.footnote).foregroundStyle(.red)
+            }
+            if canRetry {
                 HStack {
-                    Text(error).font(.footnote).foregroundStyle(.red)
                     Spacer()
-                    if canRetry {
-                        Button("Retry", action: retry)
-                            .buttonStyle(.borderless)
-                    }
+                    Button("Retry", action: retry)
+                        .buttonStyle(.borderless)
                 }
             }
         }
@@ -166,7 +166,7 @@ private struct ProfileRow: View {
     }
 
     private var canRetry: Bool {
-        !isRefreshing && (profile.snapshotState == .cached || profile.snapshotState == .failed)
+        !isRefreshing && profile.supportsRetry
     }
 
     private var statusText: String {
