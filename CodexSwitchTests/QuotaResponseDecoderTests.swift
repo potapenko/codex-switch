@@ -120,6 +120,21 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertFalse(AccountProfile(snapshotState: .signInRequired).supportsRetry)
     }
 
+    func testProfileOrderingMovesAProfileBeforeTheDropTarget() {
+        let first = AccountProfile(label: "First")
+        let second = AccountProfile(label: "Second")
+        let third = AccountProfile(label: "Third")
+        let profiles = [first, second, third]
+
+        let reordered = ProfileOrdering.moving(profiles, profileID: third.id, before: first.id)
+
+        XCTAssertEqual(reordered.map(\.id), [third.id, first.id, second.id])
+        XCTAssertEqual(
+            ProfileOrdering.moving(reordered, profileID: third.id, before: third.id),
+            reordered
+        )
+    }
+
     func testResetCreditBadgeKeepsZeroVisibleAndAccentsAvailableCredits() {
         let noCredits = ResetCredits(availableCount: 0, details: nil)
         let availableCredits = ResetCredits(availableCount: 1, details: nil)

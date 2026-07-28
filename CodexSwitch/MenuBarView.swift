@@ -48,6 +48,14 @@ struct MenuBarView: View {
                             appState.updateNickname(nickname, for: profile.id)
                         }
                     )
+                    .dropDestination(for: String.self) { droppedProfileIDs, _ in
+                        guard let droppedProfileID = droppedProfileIDs.first,
+                              let profileID = UUID(uuidString: droppedProfileID) else {
+                            return false
+                        }
+                        appState.moveAccount(profileID: profileID, before: profile.id)
+                        return true
+                    }
                     if profile.id != appState.profiles.last?.id { Divider() }
                 }
             }
@@ -92,6 +100,12 @@ private struct ProfileRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
+                Image(systemName: "line.3.horizontal")
+                    .imageScale(.small)
+                    .foregroundStyle(.tertiary)
+                    .draggable(profile.id.uuidString)
+                    .help("Drag to reorder accounts")
+                    .accessibilityLabel("Drag to reorder \(displayName)")
                 profileName
                 Spacer()
                 if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }

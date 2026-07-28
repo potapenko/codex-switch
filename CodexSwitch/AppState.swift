@@ -46,6 +46,17 @@ final class AppState {
         }
     }
 
+    func moveAccount(profileID: UUID, before targetProfileID: UUID) {
+        let reorderedProfiles = ProfileOrdering.moving(
+            profiles,
+            profileID: profileID,
+            before: targetProfileID
+        )
+        guard reorderedProfiles != profiles else { return }
+        profiles = reorderedProfiles
+        persist()
+    }
+
     func retry(profileID: UUID) async {
         guard !isRefreshing, let profile = profiles.first(where: { $0.id == profileID }) else { return }
         isRefreshing = true

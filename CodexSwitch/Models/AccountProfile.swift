@@ -66,6 +66,27 @@ enum SnapshotState: String, Codable, Hashable {
     case failed
 }
 
+enum ProfileOrdering {
+    static func moving(
+        _ profiles: [AccountProfile],
+        profileID: UUID,
+        before targetProfileID: UUID
+    ) -> [AccountProfile] {
+        guard profileID != targetProfileID,
+              let sourceIndex = profiles.firstIndex(where: { $0.id == profileID }) else {
+            return profiles
+        }
+
+        var reorderedProfiles = profiles
+        let profile = reorderedProfiles.remove(at: sourceIndex)
+        guard let targetIndex = reorderedProfiles.firstIndex(where: { $0.id == targetProfileID }) else {
+            return profiles
+        }
+        reorderedProfiles.insert(profile, at: targetIndex)
+        return reorderedProfiles
+    }
+}
+
 struct AccountSnapshot: Codable, Hashable {
     var email: String?
     var plan: String?

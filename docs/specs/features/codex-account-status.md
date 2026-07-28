@@ -31,6 +31,10 @@ five separately authenticated ChatGPT accounts.
   label, plan when available, the remaining percentage for the `codex` primary
   quota, its next reset as a calendar date and time, and the last successful
   refresh. The raw used percentage is retained for accessibility only.
+- The owner can drag a profile by its small reorder handle and drop it onto
+  another profile to place it before that row. The chosen order is saved with
+  the local dashboard metadata and has no effect on authentication, refreshes,
+  or reported quota values.
 - An eye control in the menu header toggles a local share view. While enabled,
   each visible email label is replaced by its current list position (`Account
   1`, `Account 2`, and so on) or an optional owner-provided account name. Only
