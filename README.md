@@ -37,6 +37,19 @@ or OAuth token, and it never reads or modifies Codex authentication files.
 It is a display-only dashboard: it does not switch, launch, or terminate Codex
 sessions.
 
+## Install
+
+1. Download `CodexSwitch-<version>.dmg` from the [latest GitHub
+   Release](https://github.com/potapenko/codex-switch/releases/latest).
+2. Open the disk image and drag `CodexSwitch.app` to Applications.
+3. Open CodexSwitch from Applications and add the Codex accounts you want to
+   monitor.
+
+Public releases are signed with an Apple Developer ID and notarized by Apple.
+Each release includes a ZIP archive, `SHA256SUMS.txt`, and a release manifest.
+
+For release setup and local packaging checks, see [Releasing CodexSwitch](docs/releasing.md).
+
 ## Development
 
 Requirements:

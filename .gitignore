@@ -9,4 +9,5 @@ dist/
 *.dSYM
 .swiftpm/
 .build/
+__pycache__/
 CodexSwitch.xcodeproj/project.xcworkspace/xcuserdata/

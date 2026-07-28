@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0B1C2D3E4F5061728394A5B6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B1C2D3E4F5061728394A5B5 /* Assets.xcassets */; };
 		0E65720D0B05F74E0AA9DC55 /* CodexAppServerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D84046F76434C375539E35 /* CodexAppServerClient.swift */; };
 		2C375FAEB88F13787055ECA4 /* CodexSwitchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */; };
+		3BDCA189F91A9CFF215BB831 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7715C76DFE7EE431CE6AE883 /* Assets.xcassets */; };
 		534396843460D1119A27F748 /* QuotaResponseDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1C669C77572CC6FD2173B /* QuotaResponseDecoder.swift */; };
 		5C359AF5093B79E825974822 /* QuotaResponseDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3E24947F642C71BB4DB97B6 /* QuotaResponseDecoderTests.swift */; };
 		6AA91AACEFB0032619B8E986 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB05FBB5C68CBE6684FA84CD /* AppState.swift */; };
@@ -29,8 +29,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0B1C2D3E4F5061728394A5B5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1F051BB61E1EE422F2478113 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		7715C76DFE7EE431CE6AE883 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
 		A3E24947F642C71BB4DB97B6 /* QuotaResponseDecoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaResponseDecoderTests.swift; sourceTree = "<group>"; };
 		A5C7AD995E8B3F3E419AB183 /* AccountProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfile.swift; sourceTree = "<group>"; };
@@ -91,8 +91,8 @@
 		E52820D3565E4DEE61C14242 /* CodexSwitch */ = {
 			isa = PBXGroup;
 			children = (
-				0B1C2D3E4F5061728394A5B5 /* Assets.xcassets */,
 				EB05FBB5C68CBE6684FA84CD /* AppState.swift */,
+				7715C76DFE7EE431CE6AE883 /* Assets.xcassets */,
 				C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */,
 				1F051BB61E1EE422F2478113 /* Info.plist */,
 				BAA28229B1C67D389AD860B4 /* MenuBarView.swift */,
@@ -128,7 +128,7 @@
 			buildConfigurationList = 827BBEDE55EF04F49CC84CF7 /* Build configuration list for PBXNativeTarget "CodexSwitch" */;
 			buildPhases = (
 				71ACE4EB0BD5F2D3E155CD86 /* Sources */,
-				0B1C2D3E4F5061728394A5B4 /* Resources */,
+				5AFDD083B70FD5452259DDBF /* Resources */,
 			);
 			buildRules = (
 			);
@@ -179,11 +179,11 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		0B1C2D3E4F5061728394A5B4 /* Resources */ = {
+		5AFDD083B70FD5452259DDBF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0B1C2D3E4F5061728394A5B6 /* Assets.xcassets in Resources */,
+				3BDCA189F91A9CFF215BB831 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,12 +285,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = CodexSwitch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eugenepotapenko.CodexSwitch;
 				PRODUCT_NAME = CodexSwitch;
 				SDKROOT = macosx;
@@ -400,12 +402,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = CodexSwitch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.eugenepotapenko.CodexSwitch;
 				PRODUCT_NAME = CodexSwitch;
 				SDKROOT = macosx;
