@@ -16,16 +16,32 @@ enum CodexSwitchApp {
 }
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private let appState = AppState()
     private var statusItem: NSStatusItem?
     private let popover = NSPopover()
+    private var outsideClickMonitor: Any?
+    private var workspaceActivationObserver: NSObjectProtocol?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let controller = NSHostingController(rootView: MenuBarView(appState: appState))
         controller.sizingOptions = [.preferredContentSize]
         popover.contentViewController = controller
         popover.behavior = .transient
+        popover.delegate = self
+        workspaceActivationObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let application = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
+                  application.processIdentifier != ProcessInfo.processInfo.processIdentifier else {
+                return
+            }
+            Task { @MainActor in
+                self?.closePopover()
+            }
+        }
 
         let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         let statusIcon = NSImage(named: "StatusIcon")
@@ -42,17 +58,51 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidResignActive(_ notification: Notification) {
-        popover.performClose(nil)
+        closePopover()
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        removeOutsideClickMonitor()
+        if let workspaceActivationObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(workspaceActivationObserver)
+        }
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        removeOutsideClickMonitor()
     }
 
     @objc private func togglePopover(_ sender: NSStatusBarButton) {
         if popover.isShown {
-            popover.performClose(nil)
+            closePopover()
         } else {
             Task {
                 await appState.refreshAll()
             }
             popover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
+            installOutsideClickMonitor()
         }
+    }
+
+    private func closePopover() {
+        popover.performClose(nil)
+        removeOutsideClickMonitor()
+    }
+
+    private func installOutsideClickMonitor() {
+        guard outsideClickMonitor == nil else { return }
+        outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(
+            matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.closePopover()
+            }
+        }
+    }
+
+    private func removeOutsideClickMonitor() {
+        guard let outsideClickMonitor else { return }
+        NSEvent.removeMonitor(outsideClickMonitor)
+        self.outsideClickMonitor = nil
     }
 }
