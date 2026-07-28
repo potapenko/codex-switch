@@ -32,6 +32,20 @@ store mode, or that a second instance has the expected visible account. It is
 not an approved production contract and must not be relied on until the
 controlled tests below pass.
 
+## Empty-profile launch result
+
+An isolated empty `CODEX_HOME` and an isolated candidate Electron user-data
+directory were created for a non-authenticated launch attempt. Launch Services
+started one additional `ChatGPT` root process, but it exited before presenting
+a Desktop window. No login was attempted and no credentials, process arguments,
+or environment values were inspected.
+
+This rejects `open -n` plus the candidate environment variables as a usable
+launcher mechanism for the currently installed Desktop version. Do not build a
+switch action on it. A future spike must find a supported mechanism that can
+produce one visible Desktop instance with the selected isolated state before
+any identity or hard-switch test proceeds.
+
 ## Remaining controlled tests
 
 1. Create two disposable isolated homes and complete normal browser login in
