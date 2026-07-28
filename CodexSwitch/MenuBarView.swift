@@ -3,6 +3,7 @@ import SwiftUI
 struct MenuBarView: View {
     @Bindable var appState: AppState
     @State private var areEmailsMasked = false
+    @State private var isProfileLimitAlertPresented = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -53,9 +54,12 @@ struct MenuBarView: View {
 
             Divider()
             Button("Add account") {
-                Task { await appState.addAccount() }
+                if appState.profiles.count >= 5 {
+                    isProfileLimitAlertPresented = true
+                } else {
+                    Task { await appState.addAccount() }
+                }
             }
-            .disabled(appState.profiles.count >= 5 || appState.isRefreshing)
 
             if appState.profiles.count >= 5 {
                 Text("Five profiles is the first-release limit.")
@@ -65,6 +69,11 @@ struct MenuBarView: View {
         }
         .padding(14)
         .frame(width: 360)
+        .alert("Five profile limit", isPresented: $isProfileLimitAlertPresented) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Remove an existing account before adding another one.")
+        }
     }
 }
 

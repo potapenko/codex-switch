@@ -69,9 +69,12 @@ five separately authenticated ChatGPT accounts.
 - This dashboard is display-only: selecting a profile does not switch the
   running Codex or ChatGPT desktop session. Account/session switching is not a
   planned CodexSwitch feature.
-- **Add account** starts a normal browser login. After it succeeds, the app
-  refreshes the profile and replaces its provisional label with the returned
-  email when available.
+- **Add account** is always an enabled control, including while existing
+  profiles refresh and when the five-profile limit has been reached. It starts
+  a normal browser login when capacity is available. At the limit, selecting it
+  presents a short explanation that one existing profile must be removed before
+  another can be added. After a successful login, the app refreshes the profile
+  and replaces its provisional label with the returned email when available.
 - **Refresh all** reads each stored profile independently. A failure leaves the
   last successful snapshot visible and gives that profile a short status.
 - A failed or cached profile exposes a per-row **Retry** action. It refreshes
