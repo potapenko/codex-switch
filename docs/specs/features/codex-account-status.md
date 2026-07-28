@@ -31,10 +31,13 @@ five separately authenticated ChatGPT accounts.
   refresh. The raw used percentage is retained for accessibility only.
 - An eye control in the menu header toggles a local share view. While enabled,
   each visible email label is replaced by its current list position (`Account
-  1`, `Account 2`, and so on) or an optional owner-provided private account
-  name. Only in this share view, the visible account name is clickable and can
-  be edited inline. The control changes presentation only: it is not persisted
-  and does not alter refreshes, cached profile data, or Codex authentication.
+  1`, `Account 2`, and so on) or an optional owner-provided account name. Only
+  in this share view, the visible account name is clickable and supports inline
+  editing: the text becomes an `Account Name` field, which saves on Enter or
+  when it loses focus; Escape restores the pre-edit value. There are no save,
+  cancel, or clear buttons. The control changes presentation only: it is not
+  persisted and does not alter refreshes, cached profile data, or Codex
+  authentication.
 - The menu-bar button uses a dedicated monochrome CodexSwitch template image:
   a dense bars-and-switch mark with an alpha background. It has no black tile,
   text, or large outer padding. Its upper-left Codex mark is the dominant
@@ -72,11 +75,11 @@ five separately authenticated ChatGPT accounts.
 - A failed or cached profile exposes a per-row **Retry** action. It refreshes
   only that profile and never removes its last good snapshot. A retry has no
   account-switching side effect.
-- The owner can assign an optional local private account name only while the
-  share view is active, by clicking `Account 1`, `Account 2`, and so on. A
-  saved name replaces that default only in share view; the normal view always
-  shows the returned email and has no nickname editor. Editing or clearing the
-  private name never changes `CODEX_HOME`, OAuth credentials, or what a later
+- The owner can assign an optional local account name only while the share view
+  is active, by clicking `Account 1`, `Account 2`, and so on. A saved name
+  replaces that default only in share view; the normal view always shows the
+  returned email and has no account-name editor. Editing or clearing the
+  account name never changes `CODEX_HOME`, OAuth credentials, or what a later
   refresh reports as the account email.
 - Every account row includes a destructive **Remove account** action. It
   removes only that profile's local dashboard metadata and cached snapshot from

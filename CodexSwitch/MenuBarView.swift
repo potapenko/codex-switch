@@ -78,6 +78,7 @@ private struct ProfileRow: View {
     let saveNickname: (String) -> Void
     @State private var isEditingNickname = false
     @State private var nicknameDraft = ""
+    @FocusState private var isAccountNameFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -87,25 +88,6 @@ private struct ProfileRow: View {
                 if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }
                 Button("Remove", role: .destructive, action: remove)
                     .disabled(isRefreshing)
-            }
-            if areEmailsMasked && isEditingNickname {
-                HStack {
-                    Button("Save private name") {
-                        saveNickname(nicknameDraft)
-                        isEditingNickname = false
-                    }
-                    .disabled(isRefreshing)
-                    if profile.nickname != nil {
-                        Button("Clear") {
-                            saveNickname("")
-                            isEditingNickname = false
-                        }
-                        .disabled(isRefreshing)
-                    }
-                    Button("Cancel") {
-                        isEditingNickname = false
-                    }
-                }
             }
             if let snapshot = profile.snapshot {
                 if let primary = codexPrimaryWindow(in: snapshot), let usedPercent = primary.usedPercent {
@@ -144,7 +126,7 @@ private struct ProfileRow: View {
         }
         .onChange(of: areEmailsMasked) { _, isMasked in
             if !isMasked {
-                isEditingNickname = false
+                saveAccountName()
             }
         }
     }
@@ -153,20 +135,36 @@ private struct ProfileRow: View {
     private var profileName: some View {
         if areEmailsMasked {
             if isEditingNickname {
-                TextField("Private account name", text: $nicknameDraft)
+                TextField("Account Name", text: $nicknameDraft)
                     .textFieldStyle(.roundedBorder)
-                    .accessibilityLabel("Private account name")
+                    .focused($isAccountNameFocused)
+                    .accessibilityLabel("Account Name")
+                    .onSubmit(saveAccountName)
+                    .onChange(of: isAccountNameFocused) { _, isFocused in
+                        if !isFocused {
+                            saveAccountName()
+                        }
+                    }
+                    .onKeyPress(.escape) {
+                        cancelAccountNameEditing()
+                        return .handled
+                    }
+                    .onExitCommand(perform: cancelAccountNameEditing)
+                    .onAppear {
+                        DispatchQueue.main.async {
+                            isAccountNameFocused = true
+                        }
+                    }
             } else {
                 Button {
-                    nicknameDraft = profile.nickname ?? ""
-                    isEditingNickname = true
+                    beginAccountNameEditing()
                 } label: {
                     Text(displayName).fontWeight(.medium)
                 }
                 .buttonStyle(.plain)
                 .disabled(isRefreshing)
-                .help("Edit private account name")
-                .accessibilityLabel("Edit private account name: \(displayName)")
+                .help("Edit account name")
+                .accessibilityLabel("Edit account name: \(displayName)")
             }
         } else {
             Text(displayName).fontWeight(.medium)
@@ -175,6 +173,23 @@ private struct ProfileRow: View {
 
     private var canRetry: Bool {
         !isRefreshing && profile.supportsRetry
+    }
+
+    private func beginAccountNameEditing() {
+        nicknameDraft = profile.nickname ?? ""
+        isEditingNickname = true
+    }
+
+    private func saveAccountName() {
+        guard isEditingNickname else { return }
+        saveNickname(nicknameDraft)
+        isEditingNickname = false
+        isAccountNameFocused = false
+    }
+
+    private func cancelAccountNameEditing() {
+        isEditingNickname = false
+        isAccountNameFocused = false
     }
 
     private var statusText: String {

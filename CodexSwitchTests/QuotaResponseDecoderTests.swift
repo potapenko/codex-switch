@@ -98,7 +98,7 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertNil(profile.nickname)
     }
 
-    func testPrivateNameIsLocalAndOnlyChangesTheMaskedDisplayName() throws {
+    func testAccountNameIsLocalAndOnlyChangesTheMaskedDisplayName() throws {
         var profile = AccountProfile(label: "account@example.test")
 
         profile.setNickname("  Work account  ")
