@@ -46,6 +46,19 @@ switch action on it. A future spike must find a supported mechanism that can
 produce one visible Desktop instance with the selected isolated state before
 any identity or hard-switch test proceeds.
 
+## Official product boundary
+
+OpenAI's current account-switching documentation states that account switching
+is not supported in Codex Desktop. This confirms that the app has no documented
+Desktop account-switching surface today and explains why an internal launcher
+candidate is not a sufficient product contract.
+
+Until OpenAI documents a Desktop switching interface, CodexSwitch must not
+ship a switch action based on reverse-engineered environment variables. The
+dashboard can continue to use the documented local app-server boundary.
+
+Reference: [Use multiple accounts with account switching](https://help.openai.com/en/articles/20001068-use-multiple-accounts-with-account-switching).
+
 ## Remaining controlled tests
 
 1. Create two disposable isolated homes and complete normal browser login in

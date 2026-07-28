@@ -66,6 +66,13 @@ installed Codex/Desktop version's behavior for both credential-store modes and
 for a named Desktop launch. That spike uses two new test accounts/profiles only
 and observes visible account identity; it must never inspect credentials.
 
+As of July 2026, OpenAI's account-switching help explicitly says that account
+switching is not supported in Codex Desktop. That means the switcher has no
+documented Desktop product surface to rely on today. The controlled spike may
+continue to gather redacted evidence, but no production switch action may be
+implemented until it proves a supported launcher or OpenAI adds Desktop account
+switching. [Reference](https://help.openai.com/en/articles/20001068-use-multiple-accounts-with-account-switching).
+
 ### Menu-bar interaction reference
 
 [Stats](https://github.com/exelban/stats) is useful open-source visual
