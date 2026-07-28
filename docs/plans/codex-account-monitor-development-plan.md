@@ -145,23 +145,34 @@ good snapshot on failure.
 ### Desired owner flow
 
 The owner chooses a profile from the same menu and presses an explicit
-**Open Codex as this account** action. CodexSwitch then either focuses an
-already running named Desktop profile window or starts the original signed
-ChatGPT/Codex app with that profile's selected local state. It shows a pending
-state until visible account identity and `account/read` agree for the selected
-profile.
+**Switch Codex** action. CodexSwitch presents one confirmation before doing
+anything:
 
-The switcher should prefer separate named windows over replacing the user's
-only existing window. This avoids killing in-flight work and makes switching a
-focus/open operation rather than a hidden file swap.
+> Switch Codex account?
+>
+> Codex will close all open windows and active chats, then reopen as the
+> selected profile.
+
+The default action is **Cancel**. Choosing **Switch and restart Codex** is an
+explicit hard switch: CodexSwitch terminates the confirmed Desktop Codex
+target, waits for it to exit, and only then launches a fresh Desktop Codex
+instance with the selected profile's existing isolated local state. It shows
+`Switching…` until the new Desktop window's visible identity and
+`account/read` agree for the selected profile.
+
+This is a replacement workflow, not a separate-window or focus workflow. The
+owner's confirmation intentionally authorizes closing active Codex work.
 
 ### Non-negotiable safety rules
 
 - Never copy, parse, or overwrite authentication data.
 - Never modify the normal/default Codex home as a side effect of switching.
-- Never terminate a running Codex/ChatGPT process without a clear
-  user-initiated action, visible target identity, and a final confirmation if
-  that process has active work.
+- Terminate only the user-confirmed Desktop Codex target after the
+  **Switch and restart Codex** confirmation. Never use a broad `pkill codex`
+  or target CodexSwitch-owned `codex app-server` children.
+- Wait for confirmed Desktop termination with a bounded timeout before launch.
+  If it does not exit, or the replacement launch cannot verify the selected
+  identity, fail visibly and do not start a second parallel session.
 - Never claim that `CODEX_HOME` creates a separate OpenAI, browser, Keychain,
   or macOS-user security boundary.
 - A profile's selected local state may include non-secret configuration only
@@ -179,10 +190,15 @@ Codex and ChatGPT/Codex Desktop versions:
    visible emails differ where expected.
 3. Test `cli_auth_credentials_store = file`, `keyring`, and `auto` separately
    to establish whether each mode preserves profile isolation on this Mac.
-4. Launch two named original Desktop windows with their independent local state
-   and confirm the user-visible account identity in each with Computer Use.
-5. Test focus/reopen, normal quit, launch failure, expired token, and an active
-   Codex task. Verify that no non-target session is terminated or reauthenticated.
+4. Launch a named original Desktop Codex window with each independent local
+   state, one at a time, and confirm its user-visible account identity with
+   Computer Use.
+5. Test hard-switch confirmation, cancellation, normal quit, termination
+   timeout, replacement launch failure, expired token, and an active Codex
+   task. Confirm cancellation leaves Desktop Codex untouched; confirm an
+   accepted hard switch closes the confirmed Desktop Codex workload, launches
+   the replacement only after exit, and never targets non-Desktop Codex
+   processes.
 6. Record only redacted, human-readable outcomes and paths; do not retain
    token-bearing files or logs.
 
@@ -239,8 +255,9 @@ visually accepted.
 
 ### Milestone E — switcher spike and separate approval
 
-Perform the required spike above, create a distinct switching spec, request
-approval for the launcher behavior, and only then implement the switch action.
+Perform the required spike above, create a distinct switching spec for the
+confirmed hard-switch launcher, request approval for that launcher behavior,
+and only then implement the switch action.
 
 ## Open questions to settle before Milestone B
 
@@ -250,6 +267,6 @@ approval for the launcher behavior, and only then implement the switch action.
   only refresh on popover open?
 - Should a profile row show a partial email, a local nickname, or both when
   the menu is visible during screen sharing?
-- Is a separate named ChatGPT/Codex Desktop window acceptable for phase 2, or
-  is a strict one-window replacement experience required despite its higher
-  interruption risk?
+- Which exact installed Desktop Codex process and launch interface support the
+  confirmed hard-switch workflow without touching CodexSwitch's own
+  `codex app-server` children?
