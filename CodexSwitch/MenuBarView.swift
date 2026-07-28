@@ -127,8 +127,13 @@ private struct ProfileRow: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
-                if let resetCredits = snapshot.resetCredits {
-                    Text("Reset credits: \(resetCredits.availableCount)").font(.footnote).foregroundStyle(.secondary)
+                if let resetCredits = snapshot.resetCredits, resetCredits.hasAvailableCredits {
+                    StatusBadge(
+                        title: "\(resetCredits.availableCount) resets",
+                        systemImage: "arrow.counterclockwise",
+                        tint: .accentColor
+                    )
+                    .accessibilityLabel("\(resetCredits.availableCount) reset credits available")
                 }
                 TimelineView(.periodic(from: .now, by: 60)) { context in
                     Text(QuotaPresentation.updatedText(for: snapshot.refreshedAt, now: context.date))
@@ -182,8 +187,10 @@ private struct ProfileRow: View {
     private func quotaLine(primary: QuotaWindow, usedPercent: Double) -> some View {
         let remaining = QuotaPresentation.remainingPercent(from: usedPercent)
         return HStack {
-            Text("\(remaining)% remaining")
-                .fontWeight(.medium)
+            StatusBadge(
+                title: "\(remaining)% remaining",
+                tint: QuotaPresentation.availabilityTone(forRemainingPercent: remaining).tint
+            )
             Spacer()
             if let resetAt = primary.resetAt {
                 Text(resetAt, format: .dateTime.month(.abbreviated).day().hour().minute())
@@ -201,5 +208,40 @@ private struct ProfileRow: View {
     private func accessibilityLabel(for primary: QuotaWindow, usedPercent: Double, remaining: Int) -> String {
         let reset = primary.resetAt.map { ", resets \($0.formatted(date: .abbreviated, time: .shortened))" } ?? ""
         return "Codex, \(remaining) percent remaining, \(Int(usedPercent.rounded())) percent used\(reset)"
+    }
+}
+
+private struct StatusBadge: View {
+    let title: String
+    var systemImage: String? = nil
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if let systemImage {
+                Image(systemName: systemImage)
+                    .imageScale(.small)
+            }
+            Text(title)
+        }
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(.primary)
+        .padding(.horizontal, 7)
+        .padding(.vertical, 3)
+        .background(tint.opacity(0.2), in: Capsule())
+        .overlay {
+            Capsule()
+                .stroke(tint.opacity(0.42), lineWidth: 1)
+        }
+    }
+}
+
+private extension QuotaPresentation.AvailabilityTone {
+    var tint: Color {
+        switch self {
+        case .abundant: .green
+        case .limited: .yellow
+        case .low: .orange
+        }
     }
 }

@@ -197,6 +197,10 @@ struct QuotaWindow: Codable, Hashable, Identifiable {
 struct ResetCredits: Codable, Hashable {
     var availableCount: Int
     var details: [ResetCreditDetail]?
+
+    var hasAvailableCredits: Bool {
+        availableCount > 0
+    }
 }
 
 struct ResetCreditDetail: Codable, Hashable, Identifiable {
@@ -215,8 +219,22 @@ struct ResetCreditDetail: Codable, Hashable, Identifiable {
 }
 
 enum QuotaPresentation {
+    enum AvailabilityTone: Hashable {
+        case abundant
+        case limited
+        case low
+    }
+
     static func remainingPercent(from usedPercent: Double) -> Int {
         min(100, max(0, Int((100 - usedPercent).rounded())))
+    }
+
+    static func availabilityTone(forRemainingPercent remainingPercent: Int) -> AvailabilityTone {
+        switch remainingPercent {
+        case 75...: .abundant
+        case 25...: .limited
+        default: .low
+        }
     }
 
     static func updatedText(for date: Date, now: Date) -> String {

@@ -62,6 +62,11 @@ final class QuotaResponseDecoderTests: XCTestCase {
     func testQuotaPresentationUsesRemainingPercentAndWholeMinutes() {
         XCTAssertEqual(QuotaPresentation.remainingPercent(from: 63), 37)
         XCTAssertEqual(QuotaPresentation.remainingPercent(from: 120), 0)
+        XCTAssertEqual(QuotaPresentation.availabilityTone(forRemainingPercent: 100), .abundant)
+        XCTAssertEqual(QuotaPresentation.availabilityTone(forRemainingPercent: 75), .abundant)
+        XCTAssertEqual(QuotaPresentation.availabilityTone(forRemainingPercent: 74), .limited)
+        XCTAssertEqual(QuotaPresentation.availabilityTone(forRemainingPercent: 25), .limited)
+        XCTAssertEqual(QuotaPresentation.availabilityTone(forRemainingPercent: 24), .low)
         XCTAssertEqual(QuotaPresentation.updatedText(for: now, now: now.addingTimeInterval(59)), "Updated just now")
         XCTAssertEqual(QuotaPresentation.updatedText(for: now, now: now.addingTimeInterval(61)), "Updated 1 min ago")
         XCTAssertEqual(QuotaPresentation.updatedText(for: now, now: now.addingTimeInterval(181)), "Updated 3 min ago")
@@ -111,5 +116,10 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertTrue(AccountProfile(snapshotState: .cached).supportsRetry)
         XCTAssertTrue(AccountProfile(snapshotState: .failed).supportsRetry)
         XCTAssertFalse(AccountProfile(snapshotState: .signInRequired).supportsRetry)
+    }
+
+    func testOnlyPositiveResetCreditCountsAreMarkedAvailable() {
+        XCTAssertFalse(ResetCredits(availableCount: 0, details: nil).hasAvailableCredits)
+        XCTAssertTrue(ResetCredits(availableCount: 1, details: nil).hasAvailableCredits)
     }
 }
