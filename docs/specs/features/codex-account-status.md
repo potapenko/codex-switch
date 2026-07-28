@@ -35,11 +35,13 @@ five separately authenticated ChatGPT accounts.
   detail, occupying at least one quarter of the icon area; the supporting bars
   are visibly smaller. It follows the macOS menu-bar tint in light and dark
   appearances.
-- The visible quota is labelled **Codex**, never “used”, Spark, or a guessed
-  duration such as daily or weekly. `remaining` is `100 - usedPercent`; when
-  no `codex` primary quota is returned, it is shown as unavailable rather than
+- The only visible quota text is the remaining percentage, followed by its
+  reset date and time. Do not repeat “Codex” in each account row: Codex is the
+  sole quota shown by this menu. `remaining` is `100 - usedPercent`; when no
+  `codex` primary quota is returned, it is shown as unavailable rather than
   zero. A technical `secondary` window is retained in the cached snapshot but
-  is not shown in the compact phase-1 row.
+  is not shown in the compact phase-1 row; the raw used percentage remains in
+  the accessibility label only.
 - The available earned-reset count is displayed. The app may show the expiry of
   a returned credit, but it must not claim a future replenishment time because
   the documented response does not provide one.

@@ -56,7 +56,7 @@ private struct ProfileRow: View {
                 if let primary = codexPrimaryWindow(in: snapshot), let usedPercent = primary.usedPercent {
                     quotaLine(primary: primary, usedPercent: usedPercent)
                 } else {
-                    Text("Codex quota unavailable")
+                    Text("Quota unavailable")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -90,9 +90,9 @@ private struct ProfileRow: View {
     private func quotaLine(primary: QuotaWindow, usedPercent: Double) -> some View {
         let remaining = QuotaPresentation.remainingPercent(from: usedPercent)
         return HStack {
-            Text("Codex")
-            Spacer()
             Text("\(remaining)% remaining")
+                .fontWeight(.medium)
+            Spacer()
             if let resetAt = primary.resetAt {
                 Text(resetAt, format: .dateTime.month(.abbreviated).day().hour().minute())
                     .foregroundStyle(.secondary)
