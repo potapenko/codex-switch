@@ -53,6 +53,10 @@ five separately authenticated ChatGPT accounts.
   email when available.
 - **Refresh all** reads each stored profile independently. A failure leaves the
   last successful snapshot visible and gives that profile a short status.
+- Every account row includes a destructive **Remove account** action. It
+  removes only that profile's local dashboard metadata and cached snapshot from
+  the visible list. It never reads, deletes, or changes the profile's isolated
+  `CODEX_HOME`, OAuth credentials, or any other Codex authentication state.
 - Opening the menu starts one **Refresh all** operation before the owner reads
   the rows, so the menu normally presents the latest available state. This is
   an on-open refresh, not background polling; repeated opening while a refresh

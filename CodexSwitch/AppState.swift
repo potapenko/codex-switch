@@ -33,6 +33,12 @@ final class AppState {
         }
     }
 
+    func removeAccount(profileID: UUID) {
+        guard !isRefreshing else { return }
+        profiles.removeAll { $0.id == profileID }
+        persist()
+    }
+
     private func loginAndRefresh(profile: AccountProfile) async throws {
         update(profileID: profile.id) {
             $0.snapshotState = .refreshing

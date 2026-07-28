@@ -20,7 +20,9 @@ struct MenuBarView: View {
                     .frame(width: 320, height: 150)
             } else {
                 ForEach(appState.profiles) { profile in
-                    ProfileRow(profile: profile)
+                    ProfileRow(profile: profile, canRemove: !appState.isRefreshing) {
+                        appState.removeAccount(profileID: profile.id)
+                    }
                     if profile.id != appState.profiles.last?.id { Divider() }
                 }
             }
@@ -44,6 +46,8 @@ struct MenuBarView: View {
 
 private struct ProfileRow: View {
     let profile: AccountProfile
+    let canRemove: Bool
+    let remove: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -51,6 +55,8 @@ private struct ProfileRow: View {
                 Text(profile.label).fontWeight(.medium)
                 Spacer()
                 if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }
+                Button("Remove", role: .destructive, action: remove)
+                    .disabled(!canRemove)
             }
             if let snapshot = profile.snapshot {
                 if let primary = codexPrimaryWindow(in: snapshot), let usedPercent = primary.usedPercent {
