@@ -44,11 +44,11 @@ final class AppState {
         }
     }
 
-    func moveAccount(profileID: UUID, before targetProfileID: UUID) {
+    func moveAccounts(from sourceOffsets: IndexSet, toOffset destination: Int) {
         let reorderedProfiles = ProfileOrdering.moving(
             profiles,
-            profileID: profileID,
-            before: targetProfileID
+            from: sourceOffsets,
+            toOffset: destination
         )
         guard reorderedProfiles != profiles else { return }
         profiles = reorderedProfiles

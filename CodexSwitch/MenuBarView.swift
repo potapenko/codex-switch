@@ -28,40 +28,34 @@ struct MenuBarView: View {
                 ContentUnavailableView("No accounts", systemImage: "person.crop.circle.badge.plus", description: Text("Add a ChatGPT account to view its Codex quotas."))
                     .frame(width: 320, height: 150)
             } else {
-                ScrollView(.vertical) {
-                    LazyVStack(alignment: .leading, spacing: 12) {
-                        ForEach(Array(appState.profiles.enumerated()), id: \.element.id) { entry in
-                            let profile = entry.element
-                            ProfileRow(
-                                profile: profile,
-                                displayName: areEmailsMasked
-                                    ? profile.maskedDisplayName(fallback: "Account \(entry.offset + 1)")
-                                    : profile.label,
-                                areEmailsMasked: areEmailsMasked,
-                                isRefreshing: appState.isRefreshing,
-                                remove: {
-                                    appState.removeAccount(profileID: profile.id)
-                                },
-                                retry: {
-                                    Task { await appState.retry(profileID: profile.id) }
-                                },
-                                saveNickname: { nickname in
-                                    appState.updateNickname(nickname, for: profile.id)
-                                }
-                            )
-                            .dropDestination(for: String.self) { droppedProfileIDs, _ in
-                                guard let droppedProfileID = droppedProfileIDs.first,
-                                      let profileID = UUID(uuidString: droppedProfileID) else {
-                                    return false
-                                }
-                                appState.moveAccount(profileID: profileID, before: profile.id)
-                                return true
+                List {
+                    ForEach(appState.profiles) { profile in
+                        let profileIndex = appState.profiles.firstIndex(where: { $0.id == profile.id }) ?? 0
+                        ProfileRow(
+                            profile: profile,
+                            displayName: areEmailsMasked
+                                ? profile.maskedDisplayName(fallback: "Account \(profileIndex + 1)")
+                                : profile.label,
+                            areEmailsMasked: areEmailsMasked,
+                            isRefreshing: appState.isRefreshing,
+                            remove: {
+                                appState.removeAccount(profileID: profile.id)
+                            },
+                            retry: {
+                                Task { await appState.retry(profileID: profile.id) }
+                            },
+                            saveNickname: { nickname in
+                                appState.updateNickname(nickname, for: profile.id)
                             }
-                            if profile.id != appState.profiles.last?.id { Divider() }
-                        }
+                        )
+                        .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0))
+                    }
+                    .onMove { sourceOffsets, destination in
+                        appState.moveAccounts(from: sourceOffsets, toOffset: destination)
                     }
                 }
-                .frame(maxHeight: 620)
+                .listStyle(.plain)
+                .frame(height: profileListHeight)
             }
 
             Divider()
@@ -71,6 +65,10 @@ struct MenuBarView: View {
         }
         .padding(14)
         .frame(width: 360)
+    }
+
+    private var profileListHeight: CGFloat {
+        min(max(CGFloat(appState.profiles.count) * 116, 150), 620)
     }
 }
 
@@ -89,12 +87,6 @@ private struct ProfileRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
-                Image(systemName: "line.3.horizontal")
-                    .imageScale(.small)
-                    .foregroundStyle(.tertiary)
-                    .draggable(profile.id.uuidString)
-                    .help("Drag to reorder accounts")
-                    .accessibilityLabel("Drag to reorder \(displayName)")
                 profileName
                 Spacer()
                 if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }

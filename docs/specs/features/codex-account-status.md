@@ -31,10 +31,11 @@ separately authenticated ChatGPT accounts.
   label, plan when available, the remaining percentage for the `codex` primary
   quota, its next reset as a calendar date and time, and the last successful
   refresh. The raw used percentage is retained for accessibility only.
-- The owner can drag a profile by its small reorder handle and drop it onto
-  another profile to place it before that row. The chosen order is saved with
-  the local dashboard metadata and has no effect on authentication, refreshes,
-  or reported quota values.
+- Profiles are presented in a native macOS reorderable list. The owner can
+  drag any non-control area of a row to move it; no custom drag handle or
+  custom drop target is shown. The chosen order is saved with the local
+  dashboard metadata and has no effect on authentication, refreshes, or
+  reported quota values.
 - The profile rows occupy a bounded, vertically scrollable area when they no
   longer fit in the popover. The header and **Add account** control stay
   visible, and no profile-count limit is imposed.

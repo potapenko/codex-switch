@@ -69,20 +69,20 @@ enum SnapshotState: String, Codable, Hashable {
 enum ProfileOrdering {
     static func moving(
         _ profiles: [AccountProfile],
-        profileID: UUID,
-        before targetProfileID: UUID
+        from sourceOffsets: IndexSet,
+        toOffset destination: Int
     ) -> [AccountProfile] {
-        guard profileID != targetProfileID,
-              let sourceIndex = profiles.firstIndex(where: { $0.id == profileID }) else {
-            return profiles
-        }
+        let validSourceOffsets = sourceOffsets.filter { profiles.indices.contains($0) }
+        guard !validSourceOffsets.isEmpty else { return profiles }
 
-        var reorderedProfiles = profiles
-        let profile = reorderedProfiles.remove(at: sourceIndex)
-        guard let targetIndex = reorderedProfiles.firstIndex(where: { $0.id == targetProfileID }) else {
-            return profiles
-        }
-        reorderedProfiles.insert(profile, at: targetIndex)
+        let movedProfiles = validSourceOffsets.map { profiles[$0] }
+        var reorderedProfiles = profiles.enumerated()
+            .filter { !validSourceOffsets.contains($0.offset) }
+            .map(\.element)
+        let clampedDestination = min(max(destination, 0), profiles.count)
+        let removedBeforeDestination = validSourceOffsets.filter { $0 < clampedDestination }.count
+        let insertionIndex = min(clampedDestination - removedBeforeDestination, reorderedProfiles.count)
+        reorderedProfiles.insert(contentsOf: movedProfiles, at: insertionIndex)
         return reorderedProfiles
     }
 }

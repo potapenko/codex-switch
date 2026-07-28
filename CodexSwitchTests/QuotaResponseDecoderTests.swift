@@ -120,19 +120,19 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertFalse(AccountProfile(snapshotState: .signInRequired).supportsRetry)
     }
 
-    func testProfileOrderingMovesAProfileBeforeTheDropTarget() {
+    func testProfileOrderingMovesASelectionUsingNativeListOffsets() {
         let first = AccountProfile(label: "First")
         let second = AccountProfile(label: "Second")
         let third = AccountProfile(label: "Third")
-        let profiles = [first, second, third]
+        let fourth = AccountProfile(label: "Fourth")
 
-        let reordered = ProfileOrdering.moving(profiles, profileID: third.id, before: first.id)
-
-        XCTAssertEqual(reordered.map(\.id), [third.id, first.id, second.id])
-        XCTAssertEqual(
-            ProfileOrdering.moving(reordered, profileID: third.id, before: third.id),
-            reordered
+        let reordered = ProfileOrdering.moving(
+            [first, second, third, fourth],
+            from: IndexSet([1, 2]),
+            toOffset: 4
         )
+
+        XCTAssertEqual(reordered.map(\.id), [first.id, fourth.id, second.id, third.id])
     }
 
     func testProfilePersistenceSupportsMoreThanFiveAccounts() throws {

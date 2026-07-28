@@ -260,8 +260,8 @@ that mode for the switcher.
 2. Make remaining/quota/reset semantics accessible through VoiceOver labels.
 3. Add per-row refresh and error recovery. Keep any automatic refresh off by
    default.
-4. Add local label editing, profile ordering, and a bounded scrollable list
-   for an unbounded number of profiles.
+4. Add local label editing and profile ordering through a native, bounded
+   scrollable macOS list for an unbounded number of profiles.
 
 ### Milestone C — visual identity
 
