@@ -20,6 +20,8 @@ five separately authenticated ChatGPT accounts.
 - API-key billing, OpenAI Platform usage, ChatGPT-web scraping, token/cookie
   import, cloud sync, telemetry, notifications, or automatic use of reset
   credits.
+- Account/session switching, Desktop Codex launch or termination, and any
+  copying, selection, or inspection of Codex authentication-profile files.
 - Inventing fixed quota windows or claiming fields unavailable from the
   installed app-server version.
 
@@ -64,9 +66,9 @@ five separately authenticated ChatGPT accounts.
   no reset badge. The app may show the expiry of a returned credit, but it must
   not claim a future replenishment time because the documented response does
   not provide one.
-- Phase 1 is display-only: selecting a profile does not switch the running
-  Codex or ChatGPT desktop session. Account switching is a separately approved
-  future feature with its own contract and safety validation.
+- This dashboard is display-only: selecting a profile does not switch the
+  running Codex or ChatGPT desktop session. Account/session switching is not a
+  planned CodexSwitch feature.
 - **Add account** starts a normal browser login. After it succeeds, the app
   refreshes the profile and replaces its provisional label with the returned
   email when available.

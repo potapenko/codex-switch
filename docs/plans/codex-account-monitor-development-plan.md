@@ -1,14 +1,15 @@
 # CodexSwitch development plan
 
-**Status:** research complete; implementation not yet authorized.
+**Status:** dashboard core complete; polish in progress. Account/session switching
+was cancelled by the owner on 2026-07-28.
 
-This is the governing plan for the two related product tracks:
+This is the governing plan for a single product track:
 
-1. a menu-bar-only read-only dashboard for five Codex/ChatGPT accounts;
-2. a later, explicitly gated account/session switcher.
+1. a menu-bar-only read-only dashboard for up to five Codex/ChatGPT accounts.
 
-The dashboard is the first delivery. The switcher is not part of that delivery
-and must not be slipped into it.
+CodexSwitch will not implement account/session switching, launch or terminate
+Desktop Codex, or handle authentication-profile files. Future work is limited
+to dashboard reliability, clarity, accessibility, and visual polish.
 
 ## Research basis
 
@@ -36,7 +37,12 @@ must never fabricate a “credits refill on …” date.
 
 Reference: [Codex App Server auth and rate limits](https://learn.chatgpt.com/docs/app-server#auth-endpoints).
 
-### Account isolation and switching: viable, but separate
+### Cancelled scope: account/session switching
+
+The owner cancelled the switcher. No technical spike, dedicated launcher,
+Desktop process termination, `CODEX_HOME` selection, credential-store study, or
+switching specification will be pursued. The historical research below is
+retained only as context and is not implementation authority.
 
 `CODEX_HOME` is the documented user-level home for Codex config and state;
 configuration profiles (`--profile`) select settings *within* one home and are
@@ -150,7 +156,11 @@ or detailed process output. An app-server owns authentication inside its
 profile. Each remote interaction has a bounded timeout and retains the last
 good snapshot on failure.
 
-## Future phase 2 — session switcher
+## Cancelled — account/session switcher (archived proposal)
+
+This proposal is retained for historical context only. It is not a future phase
+and must not be implemented, researched, or reopened without a new owner
+decision.
 
 ### Desired owner flow
 
@@ -277,20 +287,14 @@ No source review, build, unit test, or process check substitutes for step 3.
 If Computer Use is unavailable, the work can be code-complete but is not
 visually accepted.
 
-### Milestone E — switcher spike and separate approval
+### Milestone E — cancelled
 
-Perform the required spike above, create a distinct switching spec for the
-confirmed hard-switch launcher, request approval for that launcher behavior,
-and only then implement the switch action.
+Do not perform a switcher spike, create a switching spec, or implement a
+switch action.
 
 ## Open questions to settle before Milestone B
 
-- Does “current account” mean the profile last selected in CodexSwitch, the
-  account in the foreground Desktop Codex window, or both with distinct labels?
 - Should automatic polling be disabled, an opt-in 15/30/60 minute interval, or
   only refresh on popover open?
 - Should a profile row show a partial email, a local nickname, or both when
   the menu is visible during screen sharing?
-- Which exact installed Desktop Codex process and launch interface support the
-  confirmed hard-switch workflow without touching CodexSwitch's own
-  `codex app-server` children?
