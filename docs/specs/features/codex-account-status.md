@@ -29,6 +29,11 @@ five separately authenticated ChatGPT accounts.
   label, plan when available, the remaining percentage for the `codex` primary
   quota, its next reset as a calendar date and time, and the last successful
   refresh. The raw used percentage is retained for accessibility only.
+- An eye control in the menu header toggles a local share view. While enabled,
+  each visible email label is replaced by its current list position (`Account
+  1`, `Account 2`, and so on). The control changes presentation only: it is
+  not persisted and does not alter refreshes, cached profile data, or Codex
+  authentication.
 - The menu-bar button uses a dedicated monochrome CodexSwitch template image:
   a dense bars-and-switch mark with an alpha background. It has no black tile,
   text, or large outer padding. Its upper-left Codex mark is the dominant

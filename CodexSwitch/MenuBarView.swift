@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MenuBarView: View {
     @Bindable var appState: AppState
+    @State private var areEmailsMasked = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -9,6 +10,14 @@ struct MenuBarView: View {
                 Text("Codex accounts")
                     .font(.headline)
                 Spacer()
+                Button {
+                    areEmailsMasked.toggle()
+                } label: {
+                    Image(systemName: areEmailsMasked ? "eye.slash" : "eye")
+                }
+                .buttonStyle(.borderless)
+                .help(areEmailsMasked ? "Show email addresses" : "Mask email addresses")
+                .accessibilityLabel(areEmailsMasked ? "Show email addresses" : "Mask email addresses")
                 Button("Refresh all") {
                     Task { await appState.refreshAll() }
                 }
@@ -19,8 +28,13 @@ struct MenuBarView: View {
                 ContentUnavailableView("No accounts", systemImage: "person.crop.circle.badge.plus", description: Text("Add a ChatGPT account to view its Codex quotas."))
                     .frame(width: 320, height: 150)
             } else {
-                ForEach(appState.profiles) { profile in
-                    ProfileRow(profile: profile, canRemove: !appState.isRefreshing) {
+                ForEach(Array(appState.profiles.enumerated()), id: \.element.id) { entry in
+                    let profile = entry.element
+                    ProfileRow(
+                        profile: profile,
+                        displayName: areEmailsMasked ? "Account \(entry.offset + 1)" : profile.label,
+                        canRemove: !appState.isRefreshing
+                    ) {
                         appState.removeAccount(profileID: profile.id)
                     }
                     if profile.id != appState.profiles.last?.id { Divider() }
@@ -46,13 +60,14 @@ struct MenuBarView: View {
 
 private struct ProfileRow: View {
     let profile: AccountProfile
+    let displayName: String
     let canRemove: Bool
     let remove: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
-                Text(profile.label).fontWeight(.medium)
+                Text(displayName).fontWeight(.medium)
                 Spacer()
                 if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }
                 Button("Remove", role: .destructive, action: remove)
