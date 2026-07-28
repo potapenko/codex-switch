@@ -33,3 +33,18 @@ git diff --check
 ```
 
 Use `script/build_and_run.sh --verify` for a bounded app-launch smoke check.
+
+## Mandatory visual acceptance
+
+For every user-visible app change, Computer Use is the primary acceptance
+evidence. Before reporting the task complete:
+
+1. start a scoped `caffeinate -dimsu` guard;
+2. launch the freshly built app through the project run script;
+3. use Computer Use to perform and observe the changed interaction and its
+   visible result;
+4. stop the scoped guard.
+
+Builds, unit tests, source review, and process checks support this evidence but
+never replace it. If Computer Use is unavailable or blocked, report the exact
+blocker and leave visual acceptance incomplete.
