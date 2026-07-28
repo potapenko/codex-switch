@@ -66,6 +66,8 @@ five separately authenticated ChatGPT accounts.
   the rows, so the menu normally presents the latest available state. This is
   an on-open refresh, not background polling; repeated opening while a refresh
   is already running does not start a duplicate operation.
+- The popover closes when the owner clicks outside it, including when another
+  application or window becomes active.
 - The app never redeems a reset credit; it may display the available count.
 - “Updated” uses whole-minute language (for example, “Updated 2 min ago”) and
   is refreshed in the interface at most once per minute. It never shows

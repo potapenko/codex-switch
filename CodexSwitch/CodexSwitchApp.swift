@@ -41,6 +41,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     }
 
+    func applicationDidResignActive(_ notification: Notification) {
+        popover.performClose(nil)
+    }
+
     @objc private func togglePopover(_ sender: NSStatusBarButton) {
         if popover.isShown {
             popover.performClose(nil)
