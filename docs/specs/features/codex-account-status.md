@@ -52,12 +52,15 @@ five separately authenticated ChatGPT accounts.
   scannable in a row: green at 75–100% remaining, yellow at 25–74%, and orange
   below 25%. These colours are an approximate availability cue, not an error
   state. An unavailable quota has no percentage badge.
-- When earned reset credits are available (`availableCount > 0`), their count
-  is a separate accent status badge with a reset symbol. A zero or unavailable
-  count has no reset badge, so a visible reset badge always signals an action
-  the owner could choose to use later. The app may show the expiry of a
-  returned credit, but it must not claim a future replenishment time because the
-  documented response does not provide one.
+- When Codex returns an earned-reset credit count, show that count as a
+  separate status badge with a reset symbol, including `0 resets`. A zero count
+  uses a neutral muted badge so the owner can still see that reset credits are
+  a supported part of the account status and shareable screenshots preserve
+  that context. A positive count uses an accent-filled badge to signal credits
+  the owner could choose to use later. If Codex does not return a count, show
+  no reset badge. The app may show the expiry of a returned credit, but it must
+  not claim a future replenishment time because the documented response does
+  not provide one.
 - Phase 1 is display-only: selecting a profile does not switch the running
   Codex or ChatGPT desktop session. Account switching is a separately approved
   future feature with its own contract and safety validation.

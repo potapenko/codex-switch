@@ -199,11 +199,20 @@ struct QuotaWindow: Codable, Hashable, Identifiable {
 }
 
 struct ResetCredits: Codable, Hashable {
+    enum BadgeTone: Hashable {
+        case neutral
+        case available
+    }
+
     var availableCount: Int
     var details: [ResetCreditDetail]?
 
     var hasAvailableCredits: Bool {
         availableCount > 0
+    }
+
+    var badgeTone: BadgeTone {
+        hasAvailableCredits ? .available : .neutral
     }
 }
 

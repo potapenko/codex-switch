@@ -120,8 +120,13 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertFalse(AccountProfile(snapshotState: .signInRequired).supportsRetry)
     }
 
-    func testOnlyPositiveResetCreditCountsAreMarkedAvailable() {
-        XCTAssertFalse(ResetCredits(availableCount: 0, details: nil).hasAvailableCredits)
-        XCTAssertTrue(ResetCredits(availableCount: 1, details: nil).hasAvailableCredits)
+    func testResetCreditBadgeKeepsZeroVisibleAndAccentsAvailableCredits() {
+        let noCredits = ResetCredits(availableCount: 0, details: nil)
+        let availableCredits = ResetCredits(availableCount: 1, details: nil)
+
+        XCTAssertEqual(noCredits.badgeTone, .neutral)
+        XCTAssertFalse(noCredits.hasAvailableCredits)
+        XCTAssertEqual(availableCredits.badgeTone, .available)
+        XCTAssertTrue(availableCredits.hasAvailableCredits)
     }
 }

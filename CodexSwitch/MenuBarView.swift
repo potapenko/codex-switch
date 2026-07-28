@@ -115,13 +115,13 @@ private struct ProfileRow: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
-                if let resetCredits = snapshot.resetCredits, resetCredits.hasAvailableCredits {
+                if let resetCredits = snapshot.resetCredits {
                     StatusBadge(
                         title: "\(resetCredits.availableCount) resets",
                         systemImage: "arrow.counterclockwise",
-                        tint: .accentColor
+                        tint: resetCredits.badgeTone.tint
                     )
-                    .accessibilityLabel("\(resetCredits.availableCount) reset credits available")
+                    .accessibilityLabel(resetCredits.hasAvailableCredits ? "\(resetCredits.availableCount) reset credits available" : "No reset credits available")
                 }
                 TimelineView(.periodic(from: .now, by: 60)) { context in
                     Text(QuotaPresentation.updatedText(for: snapshot.refreshedAt, now: context.date))
@@ -245,6 +245,15 @@ private extension QuotaPresentation.AvailabilityTone {
         case .abundant: .green
         case .limited: .yellow
         case .low: .orange
+        }
+    }
+}
+
+private extension ResetCredits.BadgeTone {
+    var tint: Color {
+        switch self {
+        case .neutral: .gray
+        case .available: .accentColor
         }
     }
 }
