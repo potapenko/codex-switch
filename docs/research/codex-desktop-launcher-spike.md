@@ -23,7 +23,8 @@ The packaged Desktop source contains an internal, version-specific
 `CODEX_ELECTRON_USER_DATA_PATH` environment variable. It selects the Electron
 user-data path before the app requests its single-instance lock. This makes it
 a candidate for a distinct local Desktop state when paired with the selected
-profile's `CODEX_HOME`.
+profile's already-existing `CODEX_HOME` path. Passing a path never implies
+copying the directory or any of its files.
 
 This is static evidence only. It does not prove that Desktop Codex honors
 `CODEX_HOME` for authentication, that the two paths isolate every credential
@@ -49,6 +50,9 @@ controlled tests below pass.
 ## Guardrails for the remaining spike
 
 - Do not copy, parse, move, compare, or delete authentication data.
+- Do not copy a whole profile home or selected “identity” files. OAuth tokens,
+  `auth.json`, and Keychain items are credentials and must remain in the
+  profile where Codex created them.
 - Do not inspect process arguments or environment variables.
 - Do not use a broad process matcher such as `pkill codex`.
 - Keep only this redacted report and the visible identity/result summary; do

@@ -44,11 +44,14 @@ not account profiles. The configuration reference also makes the credential
 store selectable as `file`, `keyring`, or `auto`.
 
 The official app-server persists managed ChatGPT OAuth tokens. A viable account
-profile model is therefore one independently created `CODEX_HOME` per account,
-with every login initiated in that home. CodexSwitch must never inspect,
-serialize, copy, compare, or move `auth.json`, Keychain items, OAuth URLs, or
-tokens. The login itself is performed by Codex and can offer the user their
-usual Google sign-in; CodexSwitch never sees the Google password.
+profile model is therefore one independently created, persistent `CODEX_HOME`
+per account, with every login initiated in that home. Switching selects that
+already-existing profile path; it never copies the home or any subset of its
+files. CodexSwitch must never inspect, serialize, copy, compare, or move
+`auth.json`, Keychain items, OAuth URLs, or tokens. Those identity materials
+are credentials, not portable profile metadata. The login itself is performed
+by Codex and can offer the user their usual Google sign-in; CodexSwitch never
+sees the Google password.
 
 The approach has a useful open-source precedent:
 [`Ducksss/codex-profiles`](https://github.com/Ducksss/codex-profiles) launches
@@ -167,6 +170,9 @@ owner's confirmation intentionally authorizes closing active Codex work.
 
 - Never copy, parse, or overwrite authentication data.
 - Never modify the normal/default Codex home as a side effect of switching.
+- Select the pre-existing profile directories by path; never copy either a
+  whole `CODEX_HOME` or selected “identity” files between profiles or into the
+  normal/default home.
 - Terminate only the user-confirmed Desktop Codex target after the
   **Switch and restart Codex** confirmation. Never use a broad `pkill codex`
   or target CodexSwitch-owned `codex app-server` children.
