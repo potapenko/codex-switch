@@ -7,7 +7,7 @@ Sometimes, when you use more than one Codex account, you just want a quick
 answer: how much quota is left, when does it reset, and are reset credits
 available? CodexSwitch keeps those answers one click away.
 
-![Masked CodexSwitch menu showing five accounts, quota remaining, reset times, and reset credits](docs/images/codexswitch-menu-masked.png)
+<img src="docs/images/codexswitch-menu-masked.png" alt="Masked CodexSwitch menu showing five accounts, quota remaining, reset times, and reset credits" width="432">
 
 ## What it shows
 
