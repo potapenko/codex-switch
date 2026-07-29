@@ -60,6 +60,11 @@ separately authenticated ChatGPT accounts.
   detail, occupying at least one quarter of the icon area; the supporting bars
   are visibly smaller. It follows the macOS menu-bar tint in light and dark
   appearances.
+- The app bundle uses a separate square macOS application icon: an opaque
+  black field with a bold white CodexSwitch mark derived from the menu-bar
+  symbol. The mark is large, centered, high-contrast, and legible at small
+  sizes. It contains no text; this app icon does not replace the menu-bar
+  template image.
 - The only visible quota text is the remaining percentage, followed by its
   reset date and time. Do not repeat “Codex” in each account row: Codex is the
   sole quota shown by this menu. `remaining` is `100 - usedPercent`; when no
