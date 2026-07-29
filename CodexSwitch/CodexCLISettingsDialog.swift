@@ -73,7 +73,7 @@ struct CodexCLISettingsDialog: View {
             }
         }
         .padding(20)
-        .frame(width: 440)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func chooseExecutable() {

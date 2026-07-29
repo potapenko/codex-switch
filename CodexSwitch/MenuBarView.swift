@@ -3,8 +3,8 @@ import SwiftUI
 
 struct MenuBarView: View {
     @Bindable var appState: AppState
-    let openCLISettings: () -> Void
     @State private var areEmailsMasked = false
+    @State private var isCLISettingsVisible = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -21,7 +21,7 @@ struct MenuBarView: View {
                 .help(areEmailsMasked ? "Show email addresses" : "Mask email addresses")
                 .accessibilityLabel(areEmailsMasked ? "Show email addresses" : "Mask email addresses")
                 Button {
-                    openCLISettings()
+                    isCLISettingsVisible.toggle()
                 } label: {
                     Image(systemName: "gearshape")
                 }
@@ -32,6 +32,13 @@ struct MenuBarView: View {
                     Task { await appState.refreshAll() }
                 }
                 .disabled(appState.isRefreshing || appState.profiles.isEmpty)
+            }
+
+            if isCLISettingsVisible {
+                CodexCLISettingsDialog(appState: appState) {
+                    isCLISettingsVisible = false
+                }
+                Divider()
             }
 
             if appState.profiles.isEmpty {
@@ -84,7 +91,7 @@ struct MenuBarView: View {
         .frame(width: 360)
         .onChange(of: appState.isCLISettingsRequested) { _, isRequested in
             if isRequested {
-                openCLISettings()
+                isCLISettingsVisible = true
             }
         }
     }
