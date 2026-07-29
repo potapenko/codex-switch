@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct MenuBarView: View {
@@ -59,8 +60,14 @@ struct MenuBarView: View {
             }
 
             Divider()
-            Button("Add account") {
-                Task { await appState.addAccount() }
+            HStack {
+                Button("Add account") {
+                    Task { await appState.addAccount() }
+                }
+                Spacer()
+                Button("Quit") {
+                    NSApp.terminate(nil)
+                }
             }
         }
         .padding(14)
@@ -68,7 +75,7 @@ struct MenuBarView: View {
     }
 
     private var profileListHeight: CGFloat {
-        min(max(CGFloat(appState.profiles.count) * 116, 150), 620)
+        min(CGFloat(appState.profiles.count) * 104, 620)
     }
 }
 

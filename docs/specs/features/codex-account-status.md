@@ -36,9 +36,13 @@ separately authenticated ChatGPT accounts.
   custom drop target is shown. The chosen order is saved with the local
   dashboard metadata and has no effect on authentication, refreshes, or
   reported quota values.
-- The profile rows occupy a bounded, vertically scrollable area when they no
-  longer fit in the popover. The header and **Add account** control stay
-  visible, and no profile-count limit is imposed.
+- The profile rows occupy only the height required by their content, up to a
+  bounded, vertically scrollable area when they no longer fit in the popover.
+  They do not reserve blank space after the final row. The header and bottom
+  action controls stay visible, and no profile-count limit is imposed.
+- The bottom action bar contains **Add account** and **Quit**. **Quit**
+  terminates CodexSwitch only; it does not start, stop, switch, or otherwise
+  change any Codex account or desktop session.
 - An eye control in the menu header toggles a local share view. While enabled,
   each visible email label is replaced by its current list position (`Account
   1`, `Account 2`, and so on) or an optional owner-provided account name. Only
