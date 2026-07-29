@@ -84,6 +84,8 @@ jobs:
             -project CodexSwitch.xcodeproj \
             -scheme CodexSwitch \
             -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
             test
 
       - name: Check source diff
