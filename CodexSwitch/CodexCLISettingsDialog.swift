@@ -21,6 +21,18 @@ struct CodexCLISettingsDialog: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Need to find it? In Terminal, run:")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                Text("command -v codex")
+                    .font(.system(.body, design: .monospaced))
+                    .textSelection(.enabled)
+                Text("Paste the path it prints here, or choose the executable.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+
             TextField("Path to codex", text: $path)
                 .textFieldStyle(.roundedBorder)
                 .accessibilityLabel("Codex CLI path")

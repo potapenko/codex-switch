@@ -48,10 +48,11 @@ separately authenticated ChatGPT accounts.
 - A small settings gear beside the share-view eye opens a native **Codex CLI**
   dialog. It shows the locally configured absolute path to the `codex`
   executable and lets the owner paste a replacement path or choose the
-  executable in a system file picker. The dialog validates a candidate with a
-  bounded `codex --version` check before saving it. The path is non-secret
-  local app configuration shared by all profiles; it is neither a credential
-  nor an authentication-profile path.
+  executable in a system file picker. It also explains that `command -v codex`
+  in Terminal prints the path to paste into the field. The dialog validates a
+  candidate with a bounded `codex --version` check before saving it. The path
+  is non-secret local app configuration shared by all profiles; it is neither
+  a credential nor an authentication-profile path.
 - The app uses the configured absolute `codex` executable to launch
   `app-server`; it never relies solely on the Finder application's `PATH`.
   Its child environment prepends the executable's resolved containing
