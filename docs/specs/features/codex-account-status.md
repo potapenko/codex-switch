@@ -144,6 +144,9 @@ separately authenticated ChatGPT accounts.
 
 ## Invariants
 
+- CodexSwitch runs as a single local menu-bar instance. A second launch from
+  another copy of the app is rejected rather than adding a duplicate status
+  item or competing with the current local dashboard state.
 - Profile metadata and cached snapshots contain no token or OAuth URL.
 - Every profile has an isolated application-support directory passed only to
   its child `codex app-server` as `CODEX_HOME`.
