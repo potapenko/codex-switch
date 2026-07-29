@@ -25,7 +25,7 @@ concurrency:
 jobs:
   release:
     name: Build, notarize, and publish
-    runs-on: macos-14
+    runs-on: macos-26
     env:
       APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       DEVELOPER_ID_CERTIFICATE_BASE64: ${{ secrets.DEVELOPER_ID_CERTIFICATE_BASE64 }}
@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Resolve release inputs
         id: release
