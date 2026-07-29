@@ -56,6 +56,7 @@ struct MenuBarView: View {
                     }
                 }
                 .listStyle(.plain)
+                .scrollContentBackground(.hidden)
                 .frame(height: profileListHeight)
             }
 

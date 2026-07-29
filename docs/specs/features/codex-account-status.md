@@ -39,7 +39,9 @@ separately authenticated ChatGPT accounts.
 - The profile rows occupy only the height required by their content, up to a
   bounded, vertically scrollable area when they no longer fit in the popover.
   They do not reserve blank space after the final row. The header and bottom
-  action controls stay visible, and no profile-count limit is imposed.
+  action controls stay visible, and no profile-count limit is imposed. The
+  profile list background is transparent so the popover material remains
+  visible behind the rows; it is never an opaque white panel.
 - The bottom action bar contains **Add account** and **Quit**. **Quit**
   terminates CodexSwitch only; it does not start, stop, switch, or otherwise
   change any Codex account or desktop session.
