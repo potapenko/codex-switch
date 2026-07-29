@@ -50,8 +50,10 @@ separately authenticated ChatGPT accounts.
   absolute path to the `codex` executable and lets the owner paste a replacement
   path or choose the executable in a system file picker. It also explains that
   `which -a codex` in Terminal lists the available paths to paste into the field,
-  with a small copy control for that exact command. The form does not open a
-  separate window or modal dialog. It validates a candidate with a bounded
+  with a small copy control for that exact command. A Paste icon inside the path
+  field inserts a plain-text path from the system clipboard when keyboard paste
+  is unavailable. The form does not open a separate window or modal dialog. It
+  validates a candidate with a bounded
   `codex --version` check before saving it. The path is non-secret local app
   configuration shared by all profiles; it is neither a credential nor an
   authentication-profile path.

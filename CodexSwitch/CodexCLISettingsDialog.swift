@@ -45,6 +45,15 @@ struct CodexCLISettingsDialog: View {
             TextField("Path to codex", text: $path)
                 .textFieldStyle(.roundedBorder)
                 .accessibilityLabel("Codex CLI path")
+                .overlay(alignment: .trailing) {
+                    Button(action: pastePath) {
+                        Image(systemName: "clipboard")
+                    }
+                    .buttonStyle(.borderless)
+                    .padding(.trailing, 6)
+                    .help("Paste path")
+                    .accessibilityLabel("Paste path")
+                }
 
             HStack {
                 Button("Choose…", action: chooseExecutable)
@@ -112,5 +121,11 @@ struct CodexCLISettingsDialog: View {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString("which -a codex", forType: .string)
+    }
+
+    private func pastePath() {
+        guard let pastedPath = NSPasteboard.general.string(forType: .string) else { return }
+        path = pastedPath.trimmingCharacters(in: .whitespacesAndNewlines)
+        validationError = nil
     }
 }
