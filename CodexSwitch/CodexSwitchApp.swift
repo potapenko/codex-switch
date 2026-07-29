@@ -16,15 +16,19 @@ enum CodexSwitchApp {
 }
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, NSWindowDelegate {
     private let appState = AppState()
     private var statusItem: NSStatusItem?
     private let popover = NSPopover()
+    private var cliSettingsWindow: NSWindow?
     private var outsideClickMonitor: Any?
     private var workspaceActivationObserver: NSObjectProtocol?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let controller = NSHostingController(rootView: MenuBarView(appState: appState))
+        let controller = NSHostingController(rootView: MenuBarView(
+            appState: appState,
+            openCLISettings: { [weak self] in self?.showCLISettings() }
+        ))
         controller.sizingOptions = [.preferredContentSize]
         popover.contentViewController = controller
         popover.behavior = .transient
@@ -72,6 +76,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         removeOutsideClickMonitor()
     }
 
+    func windowWillClose(_ notification: Notification) {
+        guard (notification.object as? NSWindow) === cliSettingsWindow else { return }
+        cliSettingsWindow = nil
+        appState.dismissCLISettingsRequest()
+    }
+
     @objc private func togglePopover(_ sender: NSStatusBarButton) {
         if popover.isShown {
             closePopover()
@@ -87,6 +97,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private func closePopover() {
         popover.performClose(nil)
         removeOutsideClickMonitor()
+    }
+
+    private func showCLISettings() {
+        if let cliSettingsWindow {
+            NSApp.activate(ignoringOtherApps: true)
+            cliSettingsWindow.makeKeyAndOrderFront(nil)
+            return
+        }
+
+        closePopover()
+        let controller = NSHostingController(rootView: CodexCLISettingsDialog(
+            appState: appState,
+            close: { [weak self] in self?.cliSettingsWindow?.close() }
+        ))
+        let window = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 440, height: 300),
+            styleMask: [.titled, .closable, .utilityWindow],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Codex CLI"
+        window.contentViewController = controller
+        window.isFloatingPanel = true
+        window.hidesOnDeactivate = false
+        window.delegate = self
+        window.center()
+        cliSettingsWindow = window
+        NSApp.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
     }
 
     private func installOutsideClickMonitor() {

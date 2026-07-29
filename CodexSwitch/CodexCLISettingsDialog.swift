@@ -3,13 +3,14 @@ import SwiftUI
 
 struct CodexCLISettingsDialog: View {
     @Bindable var appState: AppState
-    @Environment(\.dismiss) private var dismiss
+    let close: () -> Void
     @State private var path: String
     @State private var validationError: String?
     @State private var isSaving = false
 
-    init(appState: AppState) {
+    init(appState: AppState, close: @escaping () -> Void) {
         self.appState = appState
+        self.close = close
         _path = State(initialValue: appState.codexCLIPath ?? "")
     }
 
@@ -25,10 +26,18 @@ struct CodexCLISettingsDialog: View {
                 Text("Need to find it? In Terminal, run:")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                Text("command -v codex")
-                    .font(.system(.body, design: .monospaced))
-                    .textSelection(.enabled)
-                Text("Paste the path it prints here, or choose the executable.")
+                HStack {
+                    Text("which -a codex")
+                        .font(.system(.body, design: .monospaced))
+                        .textSelection(.enabled)
+                    Button(action: copyCommand) {
+                        Image(systemName: "doc.on.doc")
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Copy command")
+                    .accessibilityLabel("Copy command")
+                }
+                Text("Paste one of the paths it lists here, or choose the executable.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -55,7 +64,7 @@ struct CodexCLISettingsDialog: View {
             HStack {
                 Button("Cancel") {
                     appState.dismissCLISettingsRequest()
-                    dismiss()
+                    close()
                 }
                 Spacer()
                 Button("Save", action: save)
@@ -90,12 +99,18 @@ struct CodexCLISettingsDialog: View {
         Task {
             do {
                 try await appState.configureCodexCLI(path: path)
-                dismiss()
+                close()
                 await appState.completeCLIConfiguration()
             } catch {
                 validationError = error.localizedDescription
             }
             isSaving = false
         }
+    }
+
+    private func copyCommand() {
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString("which -a codex", forType: .string)
     }
 }
