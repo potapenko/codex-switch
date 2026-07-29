@@ -11,3 +11,6 @@ dist/
 .build/
 __pycache__/
 CodexSwitch.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Local Apple signing material — never commit.
+Credentials/
