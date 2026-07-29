@@ -5,19 +5,33 @@ import Observation
 @Observable
 final class AppState {
     private let store = ProfileStore()
+    private let codexCLIPathStore = CodexCLIPathStore()
     private(set) var profiles: [AccountProfile]
     private(set) var isRefreshing = false
+    private(set) var codexCLIPath: String?
+    private(set) var isCLISettingsRequested = false
+    private var shouldAddAccountAfterCLIConfiguration = false
 
     init() {
         profiles = store.load()
+        codexCLIPath = codexCLIPathStore.load()
     }
 
     func addAccount() async {
+        let executable: CodexCLIExecutable
+        do {
+            executable = try configuredCodexCLI()
+        } catch {
+            shouldAddAccountAfterCLIConfiguration = true
+            requestCLISettings()
+            return
+        }
+
         let profile = AccountProfile()
         profiles.append(profile)
         persist()
         do {
-            try await loginAndRefresh(profile: profile)
+            try await loginAndRefresh(profile: profile, executable: executable)
         } catch {
             recordFailure(error, for: profile.id)
         }
@@ -25,11 +39,45 @@ final class AppState {
 
     func refreshAll() async {
         guard !isRefreshing else { return }
+        let executable: CodexCLIExecutable
+        do {
+            executable = try configuredCodexCLI()
+        } catch {
+            for profile in profiles {
+                recordFailure(error, for: profile.id)
+            }
+            requestCLISettings()
+            return
+        }
         isRefreshing = true
         defer { isRefreshing = false }
         for profile in profiles {
-            await refresh(profile: profile)
+            await refresh(profile: profile, executable: executable)
         }
+    }
+
+    func configureCodexCLI(path: String) async throws {
+        let executable = try await CodexCLIValidator.validate(path: path)
+        codexCLIPathStore.save(executable)
+        codexCLIPath = executable.url.path
+    }
+
+    func completeCLIConfiguration() async {
+        isCLISettingsRequested = false
+        if shouldAddAccountAfterCLIConfiguration {
+            shouldAddAccountAfterCLIConfiguration = false
+            await addAccount()
+        } else {
+            await refreshAll()
+        }
+    }
+
+    func requestCLISettings() {
+        isCLISettingsRequested = true
+    }
+
+    func dismissCLISettingsRequest() {
+        isCLISettingsRequested = false
     }
 
     func removeAccount(profileID: UUID) {
@@ -59,17 +107,22 @@ final class AppState {
         guard !isRefreshing, let profile = profiles.first(where: { $0.id == profileID }) else { return }
         isRefreshing = true
         defer { isRefreshing = false }
-        await refresh(profile: profile)
+        do {
+            let executable = try configuredCodexCLI()
+            await refresh(profile: profile, executable: executable)
+        } catch {
+            recordFailure(error, for: profile.id)
+        }
     }
 
-    private func loginAndRefresh(profile: AccountProfile) async throws {
+    private func loginAndRefresh(profile: AccountProfile, executable: CodexCLIExecutable) async throws {
         update(profileID: profile.id) {
             $0.snapshotState = .refreshing
             $0.lastError = nil
         }
         let client = CodexAppServerClient()
         defer { Task { await client.stop() } }
-        try await client.start(codexHome: try store.codexHome(for: profile))
+        try await client.start(codexHome: try store.codexHome(for: profile), executable: executable)
         try await client.login()
         let snapshot = try await client.readSnapshot()
         update(profileID: profile.id) {
@@ -80,7 +133,7 @@ final class AppState {
         }
     }
 
-    private func refresh(profile: AccountProfile) async {
+    private func refresh(profile: AccountProfile, executable: CodexCLIExecutable) async {
         update(profileID: profile.id) {
             $0.snapshotState = .refreshing
             $0.lastError = nil
@@ -88,7 +141,7 @@ final class AppState {
         let client = CodexAppServerClient()
         do {
             defer { Task { await client.stop() } }
-            try await client.start(codexHome: try store.codexHome(for: profile))
+            try await client.start(codexHome: try store.codexHome(for: profile), executable: executable)
             let snapshot = try await client.readSnapshot()
             update(profileID: profile.id) {
                 $0.snapshot = snapshot
@@ -122,5 +175,9 @@ final class AppState {
     private func persist() {
         do { try store.save(profiles) }
         catch { /* Persistence failure remains visible on the next interaction. */ }
+    }
+
+    private func configuredCodexCLI() throws -> CodexCLIExecutable {
+        try CodexCLIExecutable.resolve(path: codexCLIPath)
     }
 }

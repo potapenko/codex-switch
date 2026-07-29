@@ -4,6 +4,7 @@ import SwiftUI
 struct MenuBarView: View {
     @Bindable var appState: AppState
     @State private var areEmailsMasked = false
+    @State private var isCLISettingsPresented = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -19,6 +20,14 @@ struct MenuBarView: View {
                 .buttonStyle(.borderless)
                 .help(areEmailsMasked ? "Show email addresses" : "Mask email addresses")
                 .accessibilityLabel(areEmailsMasked ? "Show email addresses" : "Mask email addresses")
+                Button {
+                    isCLISettingsPresented = true
+                } label: {
+                    Image(systemName: "gearshape")
+                }
+                .buttonStyle(.borderless)
+                .help("Codex CLI settings")
+                .accessibilityLabel("Codex CLI settings")
                 Button("Refresh all") {
                     Task { await appState.refreshAll() }
                 }
@@ -73,6 +82,14 @@ struct MenuBarView: View {
         }
         .padding(14)
         .frame(width: 360)
+        .sheet(isPresented: $isCLISettingsPresented, onDismiss: appState.dismissCLISettingsRequest) {
+            CodexCLISettingsDialog(appState: appState)
+        }
+        .onChange(of: appState.isCLISettingsRequested) { _, isRequested in
+            if isRequested {
+                isCLISettingsPresented = true
+            }
+        }
     }
 
     private var profileListHeight: CGFloat {

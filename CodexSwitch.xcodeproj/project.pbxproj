@@ -13,8 +13,11 @@
 		534396843460D1119A27F748 /* QuotaResponseDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1C669C77572CC6FD2173B /* QuotaResponseDecoder.swift */; };
 		5C359AF5093B79E825974822 /* QuotaResponseDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3E24947F642C71BB4DB97B6 /* QuotaResponseDecoderTests.swift */; };
 		6AA91AACEFB0032619B8E986 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB05FBB5C68CBE6684FA84CD /* AppState.swift */; };
+		6AB1FFE9C2EF1262A454D0C0 /* CodexCLISettingsDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35060837266A920701E45282 /* CodexCLISettingsDialog.swift */; };
 		8F535E3D0074F9ED1CE24DC5 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */; };
 		B44CF9B2DD03CA58DD9C5376 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA28229B1C67D389AD860B4 /* MenuBarView.swift */; };
+		C33569F111F17331EFDA5302 /* CodexCLIConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83EC1DDB1D82D9DC98C2B49 /* CodexCLIConfigurationTests.swift */; };
+		D82ED3B3ED75097827B43E6D /* CodexCLIConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A8E61B2E4667849D4092FA /* CodexCLIConfiguration.swift */; };
 		F21612A890AB334B94E7AE8A /* AccountProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5C7AD995E8B3F3E419AB183 /* AccountProfile.swift */; };
 /* End PBXBuildFile section */
 
@@ -30,10 +33,12 @@
 
 /* Begin PBXFileReference section */
 		1F051BB61E1EE422F2478113 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		35060837266A920701E45282 /* CodexCLISettingsDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCLISettingsDialog.swift; sourceTree = "<group>"; };
 		7715C76DFE7EE431CE6AE883 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
 		A3E24947F642C71BB4DB97B6 /* QuotaResponseDecoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaResponseDecoderTests.swift; sourceTree = "<group>"; };
 		A5C7AD995E8B3F3E419AB183 /* AccountProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountProfile.swift; sourceTree = "<group>"; };
+		A83EC1DDB1D82D9DC98C2B49 /* CodexCLIConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCLIConfigurationTests.swift; sourceTree = "<group>"; };
 		B7E1C669C77572CC6FD2173B /* QuotaResponseDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaResponseDecoder.swift; sourceTree = "<group>"; };
 		BAA28229B1C67D389AD860B4 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexSwitchApp.swift; sourceTree = "<group>"; };
@@ -41,6 +46,7 @@
 		DF6F569F8B841E975AAD46CE /* CodexSwitchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodexSwitchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7976CE1C4CD47F46DB4FDA1 /* CodexSwitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexSwitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB05FBB5C68CBE6684FA84CD /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		F9A8E61B2E4667849D4092FA /* CodexCLIConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCLIConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -56,6 +62,7 @@
 		6D55F04A727CB42E80E1C298 /* CodexSwitchTests */ = {
 			isa = PBXGroup;
 			children = (
+				A83EC1DDB1D82D9DC98C2B49 /* CodexCLIConfigurationTests.swift */,
 				A3E24947F642C71BB4DB97B6 /* QuotaResponseDecoderTests.swift */,
 			);
 			path = CodexSwitchTests;
@@ -82,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				D7D84046F76434C375539E35 /* CodexAppServerClient.swift */,
+				F9A8E61B2E4667849D4092FA /* CodexCLIConfiguration.swift */,
 				9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */,
 				B7E1C669C77572CC6FD2173B /* QuotaResponseDecoder.swift */,
 			);
@@ -93,6 +101,7 @@
 			children = (
 				EB05FBB5C68CBE6684FA84CD /* AppState.swift */,
 				7715C76DFE7EE431CE6AE883 /* Assets.xcassets */,
+				35060837266A920701E45282 /* CodexCLISettingsDialog.swift */,
 				C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */,
 				1F051BB61E1EE422F2478113 /* Info.plist */,
 				BAA28229B1C67D389AD860B4 /* MenuBarView.swift */,
@@ -198,6 +207,8 @@
 				F21612A890AB334B94E7AE8A /* AccountProfile.swift in Sources */,
 				6AA91AACEFB0032619B8E986 /* AppState.swift in Sources */,
 				0E65720D0B05F74E0AA9DC55 /* CodexAppServerClient.swift in Sources */,
+				D82ED3B3ED75097827B43E6D /* CodexCLIConfiguration.swift in Sources */,
+				6AB1FFE9C2EF1262A454D0C0 /* CodexCLISettingsDialog.swift in Sources */,
 				2C375FAEB88F13787055ECA4 /* CodexSwitchApp.swift in Sources */,
 				B44CF9B2DD03CA58DD9C5376 /* MenuBarView.swift in Sources */,
 				8F535E3D0074F9ED1CE24DC5 /* ProfileStore.swift in Sources */,
@@ -209,6 +220,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C33569F111F17331EFDA5302 /* CodexCLIConfigurationTests.swift in Sources */,
 				5C359AF5093B79E825974822 /* QuotaResponseDecoderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

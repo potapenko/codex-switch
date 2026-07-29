@@ -45,6 +45,21 @@ separately authenticated ChatGPT accounts.
 - The bottom action bar contains **Add account** and **Quit**. **Quit**
   terminates CodexSwitch only; it does not start, stop, switch, or otherwise
   change any Codex account or desktop session.
+- A small settings gear beside the share-view eye opens a native **Codex CLI**
+  dialog. It shows the locally configured absolute path to the `codex`
+  executable and lets the owner paste a replacement path or choose the
+  executable in a system file picker. The dialog validates a candidate with a
+  bounded `codex --version` check before saving it. The path is non-secret
+  local app configuration shared by all profiles; it is neither a credential
+  nor an authentication-profile path.
+- The app uses the configured absolute `codex` executable to launch
+  `app-server`; it never relies solely on the Finder application's `PATH`.
+  Its child environment prepends the executable's resolved containing
+  directory so Node-, npm-, NVM-, Homebrew-, script-, and custom-installed
+  CLIs can locate their companion runtime. When no saved path is valid, an
+  account action opens the same chooser before attempting login or refresh.
+  A user can therefore select any working local `codex` installation without
+  CodexSwitch guessing a machine-specific path.
 - An eye control in the menu header toggles a local share view. While enabled,
   each visible email label is replaced by its current list position (`Account
   1`, `Account 2`, and so on) or an optional owner-provided account name. Only
@@ -156,11 +171,15 @@ separately authenticated ChatGPT accounts.
 - Every profile has an isolated application-support directory passed only to
   its child `codex app-server` as `CODEX_HOME`.
 - Child-process login and refresh calls time out rather than wait forever.
+- A configured CLI path is validated before it is saved and again before a
+  child server starts. A missing, stale, or immediately exited executable is a
+  local CLI-availability failure, not a 30-second account/network timeout.
 
 ## Failure policy
 
-- If `codex` is unavailable, a profile shows a short installation/availability
-  error; no fallback browser scraping is attempted.
+- If `codex` is unavailable, stale, or cannot start, the app presents a short
+  CLI-availability error and offers the same **Codex CLI** chooser; no fallback
+  browser scraping is attempted.
 - If the server returns no account or no quota buckets, the UI reports that
   fact without treating it as zero usage.
 - A cancelled or timed-out login retains no authenticated snapshot.

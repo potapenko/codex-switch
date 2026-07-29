@@ -6,6 +6,7 @@ actor CodexAppServerClient {
         case unavailable
         case invalidResponse
         case server
+        case cliExited
         case requestTimedOut
         case loginTimedOut
         case signInRequired
@@ -18,6 +19,8 @@ actor CodexAppServerClient {
                 return "Codex returned an unreadable response."
             case .server:
                 return "Codex could not complete the request."
+            case .cliExited:
+                return "Codex CLI stopped before it could respond. Use the settings gear to choose it again."
             case .requestTimedOut:
                 return "Codex did not respond within 30 seconds."
             case .loginTimedOut:
@@ -35,20 +38,23 @@ actor CodexAppServerClient {
     private var loginContinuation: CheckedContinuation<Void, Error>?
     private var readerTask: Task<Void, Never>?
 
-    func start(codexHome: URL) async throws {
+    func start(codexHome: URL, executable: CodexCLIExecutable) async throws {
         guard process == nil else { return }
 
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-        process.arguments = ["codex", "app-server"]
-        var environment = ProcessInfo.processInfo.environment
+        process.executableURL = executable.url
+        process.arguments = ["app-server"]
+        var environment = executable.environment(basedOn: ProcessInfo.processInfo.environment)
         environment["CODEX_HOME"] = codexHome.path
         process.environment = environment
         let inputPipe = Pipe()
         let outputPipe = Pipe()
         process.standardInput = inputPipe
         process.standardOutput = outputPipe
-        process.standardError = FileHandle.standardError
+        process.standardError = FileHandle.nullDevice
+        process.terminationHandler = { [weak self] _ in
+            Task { await self?.didTerminate() }
+        }
 
         do {
             try process.run()
@@ -80,6 +86,7 @@ actor CodexAppServerClient {
         readerTask = nil
         input?.closeFile()
         input = nil
+        process?.terminationHandler = nil
         process?.terminate()
         process = nil
         failPending(with: CancellationError())
@@ -176,6 +183,11 @@ actor CodexAppServerClient {
         loginContinuation = nil
         let success = (message["params"] as? [String: Any])?["success"] as? Bool ?? false
         success ? continuation.resume() : continuation.resume(throwing: ClientError.server)
+    }
+
+    private func didTerminate() {
+        guard process != nil else { return }
+        failPending(with: ClientError.cliExited)
     }
 
     private func waitForLogin() async throws {
