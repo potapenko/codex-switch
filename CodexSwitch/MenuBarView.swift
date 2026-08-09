@@ -1,14 +1,42 @@
 import AppKit
+import Observation
 import SwiftUI
+
+@MainActor
+@Observable
+final class PopoverLayoutState {
+    private(set) var maximumHeight: CGFloat
+
+    init(visibleScreenHeight: CGFloat) {
+        maximumHeight = PopoverLayout.maximumHeight(forVisibleScreenHeight: visibleScreenHeight)
+    }
+
+    func update(visibleScreenHeight: CGFloat) {
+        maximumHeight = PopoverLayout.maximumHeight(forVisibleScreenHeight: visibleScreenHeight)
+    }
+}
+
+enum PopoverLayout {
+    static let minimumHeight: CGFloat = 260
+    // NSPopover adds roughly 26 points of arrow/chrome outside its SwiftUI content.
+    // Reserve another 14 points so the outer popover does not touch the screen edge.
+    static let screenEdgeMargin: CGFloat = 40
+
+    static func maximumHeight(forVisibleScreenHeight visibleScreenHeight: CGFloat) -> CGFloat {
+        max(minimumHeight, visibleScreenHeight - screenEdgeMargin)
+    }
+}
 
 struct MenuBarView: View {
     @Bindable var appState: AppState
+    @Bindable var popoverLayout: PopoverLayoutState
     @State private var areEmailsMasked = false
     @State private var isCLISettingsVisible = false
     @State private var profileListViewportHeight: CGFloat
 
-    init(appState: AppState) {
+    init(appState: AppState, popoverLayout: PopoverLayoutState) {
         self.appState = appState
+        self.popoverLayout = popoverLayout
         _profileListViewportHeight = State(
             initialValue: Self.desiredProfileListHeight(for: appState.profiles)
         )
@@ -85,7 +113,12 @@ struct MenuBarView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                .frame(height: profileListViewportHeight)
+                .frame(
+                    minHeight: min(profileListViewportHeight, 80),
+                    idealHeight: profileListViewportHeight,
+                    maxHeight: profileListViewportHeight
+                )
+                .layoutPriority(-1)
             }
 
             Divider()
@@ -101,6 +134,7 @@ struct MenuBarView: View {
         }
         .padding(14)
         .frame(width: 360)
+        .frame(maxHeight: popoverLayout.maximumHeight)
         .onChange(of: appState.isCLISettingsRequested) { _, isRequested in
             if isRequested {
                 isCLISettingsVisible = true
@@ -124,10 +158,9 @@ struct MenuBarView: View {
     }
 
     private static func desiredProfileListHeight(for profiles: [AccountProfile]) -> CGFloat {
-        let contentHeight = profiles.reduce(CGFloat.zero) { height, profile in
-            height + estimatedHeight(for: profile)
+        profiles.reduce(CGFloat.zero) { height, profile in
+            height + estimatedHeight(for: profile) + 10
         }
-        return min(contentHeight, 620)
     }
 
     private static func estimatedHeight(for profile: AccountProfile) -> CGFloat {

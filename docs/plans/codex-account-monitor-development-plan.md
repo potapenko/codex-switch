@@ -316,6 +316,49 @@ interactive login.
   `docs/specs/features/codex-account-status.md`.
 - Contract revision: `codex-account-status` revision 5.
 
+### Contract Delta: screen-bounded-profile-list-6
+
+- Change mode: Evolve.
+- Authorized by: owner request on 2026-08-09.
+- Domain and clauses: `codex-account-status`, popover height, profile-list
+  viewport, and overflow behavior.
+- Pinned baseline: `codex-account-status` revision 5 and checkpoint `3c44a2a`.
+- Previous behavior: the SwiftUI list stopped growing at an absolute `620`
+  point viewport even when the current display had enough usable vertical
+  space, so five recovery rows unnecessarily required scrolling.
+- New behavior: the AppKit status-item host supplies the current screen's
+  usable height before presentation; SwiftUI keeps the popover compact for
+  short content, grows it to that screen-derived budget, and scrolls only the
+  profile list after the full popover exhausts the budget.
+- AppKit boundary: SwiftUI has no API that identifies the `NSScreen.visibleFrame`
+  belonging to an `NSStatusBarButton`. Existing `AppDelegate` hosting code may
+  therefore publish that one scalar before presentation; it must not own,
+  render, or lay out visible content.
+- Compatibility: presentation-only evolution. Profile persistence, list order,
+  account actions, refresh publication, authentication, quota semantics, and
+  process boundaries remain unchanged.
+- Protected domains: stable refresh geometry while open, visible header/footer,
+  inline CLI settings, profile row layout, credentials, Desktop/session
+  switching, and background polling.
+- Required evidence: focused layout-budget tests, full macOS tests, launch
+  smoke, and fresh-runtime observation that five accounts fit when the current
+  screen budget permits while larger content remains natively scrollable and
+  on-screen.
+- Runtime evidence: on a display with a `1050` point visible frame, the fresh
+  build presented all five stored profiles in a `386 x 1009` popover; the fifth
+  row remained fully visible at `332 x 174`, with header and footer on-screen.
+  Expanding inline CLI settings reduced the list viewport rather than extending
+  the window: the outer popover stayed at `386 x 1036`, retained a visible
+  bottom action bar, and left a screen-edge gap while list overflow remained
+  scrollable.
+- Visual-acceptance residual: formal Computer Use is unavailable in the active
+  tool surface. macOS Accessibility measurements and a fresh-build screen
+  capture are supporting evidence only, so repository-required Computer Use
+  acceptance remains incomplete.
+- Specification paths changed: this plan and
+  `docs/specs/features/codex-account-status.md`.
+- Contract revision: `codex-account-status` revision 6.
+
 ### Local data contract
 
 Keep only:

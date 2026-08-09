@@ -18,13 +18,18 @@ enum CodexSwitchApp {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private let appState = AppState()
+    private let popoverLayout = PopoverLayoutState(
+        visibleScreenHeight: NSScreen.main?.visibleFrame.height ?? 800
+    )
     private var statusItem: NSStatusItem?
     private let popover = NSPopover()
     private var outsideClickMonitor: Any?
     private var workspaceActivationObserver: NSObjectProtocol?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let controller = NSHostingController(rootView: MenuBarView(appState: appState))
+        let controller = NSHostingController(
+            rootView: MenuBarView(appState: appState, popoverLayout: popoverLayout)
+        )
         controller.sizingOptions = [.preferredContentSize]
         popover.contentViewController = controller
         popover.behavior = .transient
@@ -77,6 +82,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         if popover.isShown {
             closePopover()
         } else {
+            let visibleScreenHeight = sender.window?.screen?.visibleFrame.height
+                ?? NSScreen.main?.visibleFrame.height
+                ?? 800
+            popoverLayout.update(visibleScreenHeight: visibleScreenHeight)
             appState.setPopoverPresented(true)
             popover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
             if !popover.isShown {

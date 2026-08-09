@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 5
+- **Contract revision:** 6
 - **Authority:** Active
-- **Stability:** Released through v1.0.4; temporally stable refresh presentation evolving
+- **Stability:** Released through v1.0.4; screen-bounded popover presentation evolving
 
 ## Goal
 
@@ -53,6 +53,15 @@ separately authenticated ChatGPT accounts.
   action controls stay visible, and no profile-count limit is imposed. The
   profile list background is transparent so the popover material remains
   visible behind the rows; it is never an opaque white panel.
+- The popover has no fixed maximum list height independent of the display. For
+  a small profile set it remains compact; as profiles are added, it grows to
+  the usable height of the screen containing the menu-bar item, with a small
+  outer safety margin. Only after the complete popover reaches that
+  screen-derived limit does the profile list scroll. Header, inline settings,
+  and bottom actions consume their actual SwiftUI layout space inside the same
+  limit, so they remain visible instead of extending the popover off-screen.
+  The screen budget is recomputed before each presentation and remains pinned
+  while that popover is open.
 - Each popover presentation establishes its list viewport before the on-open
   refresh starts. Intermediate and completed per-profile refresh states do not
   resize the outer popover or vertically move its header and footer while it is
@@ -279,6 +288,7 @@ separately authenticated ChatGPT accounts.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.
 - Computer Use acceptance observes the dedicated callout, its prominent action,
   the fixed global loading indicator, unchanged coordinates for row content
-  throughout on-open refresh, and the pending browser-sign-in presentation in
-  the freshly built popover; light and dark appearances retain readable
-  contrast and hierarchy.
+  throughout on-open refresh, screen-bounded growth for five and larger profile
+  sets, scrolling only after the current display budget is exhausted, and the
+  pending browser-sign-in presentation in the freshly built popover; light and
+  dark appearances retain readable contrast and hierarchy.

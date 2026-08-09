@@ -153,6 +153,17 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertEqual(decodedProfiles.map(\.label), profiles.map(\.label))
     }
 
+    func testPopoverMaximumHeightTracksTheVisibleScreenInsteadOfAnAbsoluteCap() {
+        XCTAssertEqual(
+            PopoverLayout.maximumHeight(forVisibleScreenHeight: 1_100),
+            1_060
+        )
+        XCTAssertEqual(
+            PopoverLayout.maximumHeight(forVisibleScreenHeight: 200),
+            PopoverLayout.minimumHeight
+        )
+    }
+
     func testRefreshBatchPublishesTerminalProfilesWithoutRestoringRemovedRows() {
         let first = AccountProfile(label: "First", nickname: "Pinned name", snapshotState: .cached)
         let second = AccountProfile(label: "Second", snapshotState: .cached)
