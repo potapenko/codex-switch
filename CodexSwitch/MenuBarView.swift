@@ -61,6 +61,9 @@ struct MenuBarView: View {
                             retry: {
                                 Task { await appState.retry(profileID: profile.id) }
                             },
+                            signIn: {
+                                Task { await appState.signInAgain(profileID: profile.id) }
+                            },
                             saveNickname: { nickname in
                                 appState.updateNickname(nickname, for: profile.id)
                             }
@@ -97,7 +100,11 @@ struct MenuBarView: View {
     }
 
     private var profileListHeight: CGFloat {
-        min(CGFloat(appState.profiles.count) * 104, 620)
+        let contentHeight = appState.profiles.reduce(CGFloat.zero) { height, profile in
+            let needsRecoveryLine = profile.snapshotState == .signInRequired || profile.snapshotState == .signingIn
+            return height + (needsRecoveryLine ? 132 : 104)
+        }
+        return min(contentHeight, 620)
     }
 }
 
@@ -108,6 +115,7 @@ private struct ProfileRow: View {
     let isRefreshing: Bool
     let remove: () -> Void
     let retry: () -> Void
+    let signIn: () -> Void
     let saveNickname: (String) -> Void
     @State private var isEditingNickname = false
     @State private var nicknameDraft = ""
@@ -142,13 +150,21 @@ private struct ProfileRow: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
-            } else {
+            } else if recoveryText == nil {
                 Text(statusText).font(.footnote).foregroundStyle(.secondary)
             }
-            if let error = profile.lastError {
+            if let recoveryText {
+                Text(recoveryText).font(.footnote).foregroundStyle(.secondary)
+            } else if let error = profile.lastError {
                 Text(error).font(.footnote).foregroundStyle(.red)
             }
-            if canRetry {
+            if canSignIn {
+                HStack {
+                    Spacer()
+                    Button("Sign in again", action: signIn)
+                        .buttonStyle(.borderless)
+                }
+            } else if canRetry {
                 HStack {
                     Spacer()
                     Button("Retry", action: retry)
@@ -159,6 +175,14 @@ private struct ProfileRow: View {
         .onChange(of: areEmailsMasked) { _, isMasked in
             if !isMasked {
                 saveAccountName()
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityActions {
+            if canSignIn {
+                Button("Sign in again", action: signIn)
+            } else if canRetry {
+                Button("Retry", action: retry)
             }
         }
     }
@@ -207,6 +231,23 @@ private struct ProfileRow: View {
         !isRefreshing && profile.supportsRetry
     }
 
+    private var canSignIn: Bool {
+        !isRefreshing && profile.supportsSignIn
+    }
+
+    private var recoveryText: String? {
+        switch profile.snapshotState {
+        case .signingIn:
+            "Finish signing in in your browser…"
+        case .signInRequired:
+            profile.snapshot == nil
+                ? "Sign in to load quota status."
+                : "Session expired. Sign in again to update this account."
+        case .fresh, .cached, .refreshing, .failed:
+            nil
+        }
+    }
+
     private func beginAccountNameEditing() {
         nicknameDraft = profile.nickname ?? ""
         isEditingNickname = true
@@ -229,6 +270,7 @@ private struct ProfileRow: View {
         case .fresh: "Fresh snapshot"
         case .cached: "Cached snapshot"
         case .refreshing: "Refreshing…"
+        case .signingIn: "Finish signing in in your browser…"
         case .signInRequired: "Sign in to load quota status."
         case .failed: "Quota status is unavailable."
         }

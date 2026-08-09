@@ -37,6 +37,13 @@ must never fabricate a “credits refill on …” date.
 
 Reference: [Codex App Server auth and rate limits](https://learn.chatgpt.com/docs/app-server#auth-endpoints).
 
+Managed ChatGPT mode makes Codex responsible for persisting and automatically
+refreshing OAuth tokens. CodexSwitch also requests a forced managed-token
+refresh through `account/read` before reading quotas. If Codex reports that the
+managed credentials are no longer usable, polling or a second quota retry
+cannot repair them; the supported recovery is another `account/login/start`
+browser flow in the same isolated profile home.
+
 ### Cancelled scope: account/session switching
 
 The owner cancelled the switcher. No technical spike, dedicated launcher,
@@ -141,6 +148,37 @@ Rules:
 
 No browser cookie import, password input, API key input, or token display is
 allowed.
+
+### Existing-profile reauthentication
+
+1. A refresh that cannot refresh managed credentials retains the last good
+   quota snapshot and marks only that profile as **sign-in required**.
+2. The row offers **Sign in again**. It starts `account/login/start` in the
+   profile's existing isolated `CODEX_HOME`; it does not create another profile
+   or copy credentials from any other Codex installation.
+3. While the browser flow is pending, the row shows **Finish signing in in your
+   browser…**.
+4. A successful completion reads the account and quota again and updates the
+   same row. A cancellation, failure, or timeout preserves the old snapshot and
+   leaves **Sign in again** available.
+
+Automatic background polling remains out of this change. Opening the popover,
+**Refresh all**, and per-row **Retry** continue to request current data and the
+managed token refresh; polling does not repair credentials that require a new
+interactive login.
+
+### Contract Delta: account-reauthentication-2
+
+- Change mode: Evolve.
+- Authorized by: owner request on 2026-08-09.
+- Previous behavior: **sign-in required** was a terminal row state without a
+  recovery action.
+- New behavior: the existing row can run managed browser login in its existing
+  isolated profile home and recover without losing cached display data.
+- Compatibility: additive and backward-compatible with persisted profiles.
+- Protected domains: Desktop/session switching, credential-file handling,
+  profile isolation, quota semantics, account removal, and background polling.
+- Contract revision: `codex-account-status` revision 2.
 
 ### Local data contract
 
@@ -258,8 +296,9 @@ that mode for the switcher.
 
 1. Implement the flat account-row layout above; no separate main window.
 2. Make remaining/quota/reset semantics accessible through VoiceOver labels.
-3. Add per-row refresh and error recovery. Keep any automatic refresh off by
-   default.
+3. Add per-row refresh and error recovery, including **Sign in again** for an
+   existing profile whose managed credentials cannot be refreshed. Keep
+   automatic background polling off.
 4. Add local label editing and profile ordering through a native, bounded
    scrollable macOS list for an unbounded number of profiles.
 
@@ -292,9 +331,7 @@ visually accepted.
 Do not perform a switcher spike, create a switching spec, or implement a
 switch action.
 
-## Open questions to settle before Milestone B
+## Open questions after Milestone B
 
-- Should automatic polling be disabled, an opt-in 15/30/60 minute interval, or
-  only refresh on popover open?
 - Should a profile row show a partial email, a local nickname, or both when
   the menu is visible during screen sharing?

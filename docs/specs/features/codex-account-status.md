@@ -1,5 +1,9 @@
 # Codex account status
 
+- **Contract revision:** 2
+- **Authority:** Active
+- **Stability:** Released through v1.0.4; existing-profile reauthentication evolving
+
 ## Goal
 
 Give the owner a quick, local menu-bar view of the Codex quota state for their
@@ -9,6 +13,9 @@ separately authenticated ChatGPT accounts.
 
 - Add any number of named local profiles.
 - Start a browser sign-in through the locally installed `codex app-server`.
+- Reauthenticate an existing profile through that same app-server and its
+  existing isolated `CODEX_HOME` when managed ChatGPT credentials can no
+  longer be refreshed.
 - Read the account identity/plan and the quota buckets, reset times, and
   available earned-reset credits that the app-server returns.
 - Cache the last successful non-secret snapshot locally for offline viewing.
@@ -117,6 +124,23 @@ separately authenticated ChatGPT accounts.
 - A failed or cached profile exposes a per-row **Retry** action. It refreshes
   only that profile and never removes its last good snapshot. A retry has no
   account-switching side effect.
+- Every normal profile refresh asks the managed ChatGPT app-server to refresh
+  its token before reading quotas. Codex owns that refresh lifecycle; the app
+  never reads, stores, or refreshes OAuth tokens itself.
+- When managed credentials can no longer be refreshed, the row retains its
+  last successful snapshot and enters **sign-in required**. It presents a
+  per-row **Sign in again** action instead of **Retry**. The status is a compact
+  recovery instruction, not a raw server error.
+- **Sign in again** starts the normal managed ChatGPT browser login in that
+  profile's existing isolated `CODEX_HOME`. It never creates a replacement
+  profile, changes the profile ID, order, or local account name, or imports
+  authentication from Desktop Codex. While the browser flow is pending, the
+  row shows **Finish signing in in your browser…** and no second sign-in action.
+- After a successful reauthentication, the app reads the account and quotas,
+  updates the same row with the returned identity and current snapshot, and
+  clears the recovery status. If login is cancelled, fails, or times out, the
+  last successful snapshot remains visible, the row returns to **sign-in
+  required**, and **Sign in again** remains available.
 - The owner can assign an optional local account name only while the share view
   is active, by clicking `Account 1`, `Account 2`, and so on. A saved name
   replaces that default only in share view; the normal view always shows the
@@ -155,10 +179,12 @@ separately authenticated ChatGPT accounts.
   the service caps the detail rows.
 - Each profile is visibly in exactly one product-language state: **fresh**
   after a successful refresh, **cached** when an earlier snapshot is retained,
-  **refreshing** while a request is active, **sign-in required** when no usable
-  authentication exists, or **failed** when a refresh without a snapshot
-  fails. A fresh snapshot becomes cached after relaunch until the next
-  successful refresh. A failed refresh never removes the last good snapshot.
+  **refreshing** while a quota request is active, **signing in** while a browser
+  login is pending, **sign-in required** when no usable authentication exists,
+  or **failed** when a refresh without a snapshot fails. A fresh snapshot
+  becomes cached after relaunch until the next successful refresh. Relaunching
+  during a pending browser login restores **sign-in required**. A failed
+  refresh or sign-in never removes the last good snapshot.
 - Persisted failure text is a short, local, redacted category. Raw app-server
   messages, account payloads, OAuth URLs, and opaque reset-credit IDs are not
   persisted or shown.
@@ -187,12 +213,16 @@ separately authenticated ChatGPT accounts.
   browser scraping is attempted.
 - If the server returns no account or no quota buckets, the UI reports that
   fact without treating it as zero usage.
-- A cancelled or timed-out login retains no authenticated snapshot.
+- A cancelled or timed-out initial login retains no authenticated snapshot and
+  leaves the new profile in **sign-in required**. A cancelled, failed, or
+  timed-out reauthentication retains the existing profile's last successful
+  snapshot and returns it to **sign-in required**.
 - If Codex omits a quota, credit, plan, or reset timestamp, that field is shown
   as unavailable rather than as zero or an estimated date.
 
 ## Verification mapping
 
-- Unit tests cover profile persistence and returned-quota decoding.
+- Unit tests cover profile persistence, returned-quota decoding, and the
+  retry/sign-in action mapping for every recovery state.
 - `xcodebuild ... test` covers the build/test gate.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.

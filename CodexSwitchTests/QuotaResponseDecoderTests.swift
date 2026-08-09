@@ -113,11 +113,17 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertEqual(profile.maskedDisplayName(fallback: "Account 1"), "Account 1")
     }
 
-    func testCachedAndFailedProfilesSupportRetryWithoutAnErrorMessage() {
+    func testRecoveryStatesExposeExactlyOneAppropriateAction() {
         XCTAssertFalse(AccountProfile(snapshotState: .fresh).supportsRetry)
         XCTAssertTrue(AccountProfile(snapshotState: .cached).supportsRetry)
         XCTAssertTrue(AccountProfile(snapshotState: .failed).supportsRetry)
         XCTAssertFalse(AccountProfile(snapshotState: .signInRequired).supportsRetry)
+
+        XCTAssertFalse(AccountProfile(snapshotState: .fresh).supportsSignIn)
+        XCTAssertFalse(AccountProfile(snapshotState: .cached).supportsSignIn)
+        XCTAssertTrue(AccountProfile(snapshotState: .signInRequired).supportsSignIn)
+        XCTAssertFalse(AccountProfile(snapshotState: .signingIn).supportsSignIn)
+        XCTAssertFalse(AccountProfile(snapshotState: .signingIn).supportsRetry)
     }
 
     func testProfileOrderingMovesASelectionUsingNativeListOffsets() {

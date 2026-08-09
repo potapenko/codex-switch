@@ -17,8 +17,15 @@ struct ProfileStore {
         guard var profiles = try? JSONDecoder().decode([AccountProfile].self, from: data) else {
             return []
         }
-        for index in profiles.indices where profiles[index].snapshotState == .fresh || profiles[index].snapshotState == .refreshing {
-            profiles[index].snapshotState = profiles[index].snapshot == nil ? .signInRequired : .cached
+        for index in profiles.indices {
+            switch profiles[index].snapshotState {
+            case .fresh, .refreshing:
+                profiles[index].snapshotState = profiles[index].snapshot == nil ? .signInRequired : .cached
+            case .signingIn:
+                profiles[index].snapshotState = .signInRequired
+            case .cached, .signInRequired, .failed:
+                break
+            }
         }
         return profiles
     }

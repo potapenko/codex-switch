@@ -11,6 +11,7 @@ final class AppState {
     private(set) var codexCLIPath: String?
     private(set) var isCLISettingsRequested = false
     private var shouldAddAccountAfterCLIConfiguration = false
+    private var profileIDToSignInAfterCLIConfiguration: UUID?
 
     init() {
         profiles = store.load()
@@ -30,11 +31,7 @@ final class AppState {
         let profile = AccountProfile()
         profiles.append(profile)
         persist()
-        do {
-            try await loginAndRefresh(profile: profile, executable: executable)
-        } catch {
-            recordFailure(error, for: profile.id)
-        }
+        await loginAndRefresh(profile: profile, executable: executable)
     }
 
     func refreshAll() async {
@@ -64,7 +61,10 @@ final class AppState {
 
     func completeCLIConfiguration() async {
         isCLISettingsRequested = false
-        if shouldAddAccountAfterCLIConfiguration {
+        if let profileID = profileIDToSignInAfterCLIConfiguration {
+            profileIDToSignInAfterCLIConfiguration = nil
+            await signInAgain(profileID: profileID)
+        } else if shouldAddAccountAfterCLIConfiguration {
             shouldAddAccountAfterCLIConfiguration = false
             await addAccount()
         } else {
@@ -81,6 +81,9 @@ final class AppState {
     }
 
     func removeAccount(profileID: UUID) {
+        if profileIDToSignInAfterCLIConfiguration == profileID {
+            profileIDToSignInAfterCLIConfiguration = nil
+        }
         profiles.removeAll { $0.id == profileID }
         persist()
     }
@@ -115,21 +118,51 @@ final class AppState {
         }
     }
 
-    private func loginAndRefresh(profile: AccountProfile, executable: CodexCLIExecutable) async throws {
+    func signInAgain(profileID: UUID) async {
+        guard !isRefreshing, let profile = profiles.first(where: { $0.id == profileID }) else { return }
+        let executable: CodexCLIExecutable
+        do {
+            executable = try configuredCodexCLI()
+        } catch {
+            profileIDToSignInAfterCLIConfiguration = profileID
+            recordSignInFailure(error, for: profileID)
+            requestCLISettings()
+            return
+        }
+
+        isRefreshing = true
+        defer { isRefreshing = false }
+        await loginAndRefresh(profile: profile, executable: executable)
+    }
+
+    private func loginAndRefresh(profile: AccountProfile, executable: CodexCLIExecutable) async {
         update(profileID: profile.id) {
-            $0.snapshotState = .refreshing
+            $0.snapshotState = .signingIn
             $0.lastError = nil
         }
         let client = CodexAppServerClient()
         defer { Task { await client.stop() } }
-        try await client.start(codexHome: try store.codexHome(for: profile), executable: executable)
-        try await client.login()
-        let snapshot = try await client.readSnapshot()
+        do {
+            try await client.start(codexHome: try store.codexHome(for: profile), executable: executable)
+            try await client.login()
+        } catch {
+            recordSignInFailure(error, for: profile.id)
+            return
+        }
+
         update(profileID: profile.id) {
-            $0.snapshot = snapshot
-            $0.label = snapshot.email ?? $0.label
-            $0.snapshotState = .fresh
-            $0.lastError = nil
+            $0.snapshotState = .refreshing
+        }
+        do {
+            let snapshot = try await client.readSnapshot()
+            update(profileID: profile.id) {
+                $0.snapshot = snapshot
+                $0.label = snapshot.email ?? $0.label
+                $0.snapshotState = .fresh
+                $0.lastError = nil
+            }
+        } catch {
+            recordFailure(error, for: profile.id)
         }
     }
 
@@ -163,6 +196,13 @@ final class AppState {
             } else {
                 $0.snapshotState = $0.snapshot == nil ? .failed : .cached
             }
+        }
+    }
+
+    private func recordSignInFailure(_ error: Error, for profileID: UUID) {
+        update(profileID: profileID) {
+            $0.lastError = error.localizedDescription
+            $0.snapshotState = .signInRequired
         }
     }
 

@@ -56,12 +56,17 @@ struct AccountProfile: Codable, Hashable, Identifiable {
     var supportsRetry: Bool {
         snapshotState == .cached || snapshotState == .failed
     }
+
+    var supportsSignIn: Bool {
+        snapshotState == .signInRequired
+    }
 }
 
 enum SnapshotState: String, Codable, Hashable {
     case fresh
     case cached
     case refreshing
+    case signingIn
     case signInRequired
     case failed
 }
