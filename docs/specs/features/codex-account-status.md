@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 2
+- **Contract revision:** 3
 - **Authority:** Active
-- **Stability:** Released through v1.0.4; existing-profile reauthentication evolving
+- **Stability:** Released through v1.0.4; reauthentication recovery presentation evolving
 
 ## Goal
 
@@ -131,11 +131,21 @@ separately authenticated ChatGPT accounts.
   last successful snapshot and enters **sign-in required**. It presents a
   per-row **Sign in again** action instead of **Retry**. The status is a compact
   recovery instruction, not a raw server error.
+- **Sign-in required** is presented as a dedicated SwiftUI recovery callout
+  inside the affected row, visually separate from quota metadata and ordinary
+  refresh failures. The callout combines a semantic authentication-warning
+  symbol, the title **Sign-in required**, a short plain-language explanation,
+  and a clearly shaped, prominent **Sign in again** button. It uses a restrained
+  system-adaptive amber/orange treatment rather than destructive red, and it
+  never relies on colour alone to communicate the state. When a cached snapshot
+  exists, the explanation makes clear that cached data remains visible; when no
+  snapshot exists, it explains that sign-in is needed to load quota status.
 - **Sign in again** starts the normal managed ChatGPT browser login in that
   profile's existing isolated `CODEX_HOME`. It never creates a replacement
   profile, changes the profile ID, order, or local account name, or imports
   authentication from Desktop Codex. While the browser flow is pending, the
-  row shows **Finish signing in in your browser…** and no second sign-in action.
+  same recovery region shows a native progress indicator with **Finish signing
+  in in your browser…** and no second sign-in action.
 - After a successful reauthentication, the app reads the account and quotas,
   updates the same row with the returned identity and current snapshot, and
   clears the recovery status. If login is cancelled, fails, or times out, the
@@ -195,6 +205,10 @@ separately authenticated ChatGPT accounts.
 
 ## Invariants
 
+- All visible popover content and interaction state are implemented in SwiftUI.
+  AppKit remains limited to the narrow menu-bar status item, popover hosting,
+  application lifecycle, outside-click handling, and other system adapters that
+  SwiftUI cannot express without changing the established menu-bar behavior.
 - CodexSwitch runs as a single local menu-bar instance. A second launch from
   another copy of the app is rejected rather than adding a duplicate status
   item or competing with the current local dashboard state.
@@ -226,3 +240,6 @@ separately authenticated ChatGPT accounts.
   retry/sign-in action mapping for every recovery state.
 - `xcodebuild ... test` covers the build/test gate.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.
+- Computer Use acceptance observes the dedicated callout, its prominent action,
+  and the pending browser-sign-in presentation in the freshly built popover;
+  light and dark appearances retain readable contrast and hierarchy.

@@ -15,6 +15,8 @@
 		6AA91AACEFB0032619B8E986 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB05FBB5C68CBE6684FA84CD /* AppState.swift */; };
 		6AB1FFE9C2EF1262A454D0C0 /* CodexCLISettingsDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35060837266A920701E45282 /* CodexCLISettingsDialog.swift */; };
 		8F535E3D0074F9ED1CE24DC5 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */; };
+		A6C1E7C50B762B4C5B7F7190 /* ProfileRecoveryCallout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E4B94EF2C54D5B8A5A4C28 /* ProfileRecoveryCallout.swift */; };
+		B27AA801B9394DF4B1C75D4E /* ProfileRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3FA2299A7D948DDBABFA601 /* ProfileRow.swift */; };
 		B44CF9B2DD03CA58DD9C5376 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA28229B1C67D389AD860B4 /* MenuBarView.swift */; };
 		C33569F111F17331EFDA5302 /* CodexCLIConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83EC1DDB1D82D9DC98C2B49 /* CodexCLIConfigurationTests.swift */; };
 		D82ED3B3ED75097827B43E6D /* CodexCLIConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A8E61B2E4667849D4092FA /* CodexCLIConfiguration.swift */; };
@@ -42,9 +44,11 @@
 		B7E1C669C77572CC6FD2173B /* QuotaResponseDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaResponseDecoder.swift; sourceTree = "<group>"; };
 		BAA28229B1C67D389AD860B4 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexSwitchApp.swift; sourceTree = "<group>"; };
+		C3FA2299A7D948DDBABFA601 /* ProfileRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRow.swift; sourceTree = "<group>"; };
 		D7D84046F76434C375539E35 /* CodexAppServerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexAppServerClient.swift; sourceTree = "<group>"; };
 		DF6F569F8B841E975AAD46CE /* CodexSwitchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodexSwitchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7976CE1C4CD47F46DB4FDA1 /* CodexSwitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexSwitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9E4B94EF2C54D5B8A5A4C28 /* ProfileRecoveryCallout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRecoveryCallout.swift; sourceTree = "<group>"; };
 		EB05FBB5C68CBE6684FA84CD /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		F9A8E61B2E4667849D4092FA /* CodexCLIConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCLIConfiguration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -105,6 +109,8 @@
 				C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */,
 				1F051BB61E1EE422F2478113 /* Info.plist */,
 				BAA28229B1C67D389AD860B4 /* MenuBarView.swift */,
+				E9E4B94EF2C54D5B8A5A4C28 /* ProfileRecoveryCallout.swift */,
+				C3FA2299A7D948DDBABFA601 /* ProfileRow.swift */,
 				7E18AE8150A6F5FDB3B47480 /* Models */,
 				C4AC2198B6F5702818CFD5E7 /* Services */,
 			);
@@ -211,6 +217,8 @@
 				6AB1FFE9C2EF1262A454D0C0 /* CodexCLISettingsDialog.swift in Sources */,
 				2C375FAEB88F13787055ECA4 /* CodexSwitchApp.swift in Sources */,
 				B44CF9B2DD03CA58DD9C5376 /* MenuBarView.swift in Sources */,
+				A6C1E7C50B762B4C5B7F7190 /* ProfileRecoveryCallout.swift in Sources */,
+				B27AA801B9394DF4B1C75D4E /* ProfileRow.swift in Sources */,
 				8F535E3D0074F9ED1CE24DC5 /* ProfileStore.swift in Sources */,
 				534396843460D1119A27F748 /* QuotaResponseDecoder.swift in Sources */,
 			);

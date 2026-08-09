@@ -161,6 +161,11 @@ allowed.
 4. A successful completion reads the account and quota again and updates the
    same row. A cancellation, failure, or timeout preserves the old snapshot and
    leaves **Sign in again** available.
+5. The affected row presents recovery in a dedicated SwiftUI callout with a
+   semantic symbol, a clear **Sign-in required** title, concise explanation, and
+   a prominent native **Sign in again** button. The pending state replaces the
+   action with a progress indicator. Amber/orange is a restrained recovery cue;
+   destructive red and small borderless recovery links are not used.
 
 Automatic background polling remains out of this change. Opening the popover,
 **Refresh all**, and per-row **Retry** continue to request current data and the
@@ -179,6 +184,37 @@ interactive login.
 - Protected domains: Desktop/session switching, credential-file handling,
   profile isolation, quota semantics, account removal, and background polling.
 - Contract revision: `codex-account-status` revision 2.
+
+### Contract Delta: reauthentication-visibility-3
+
+- Change mode: Evolve.
+- Authorized by: owner request on 2026-08-09.
+- Domain and clauses: `codex-account-status`, user-visible **sign-in required**
+  and **signing in** presentation.
+- Previous behavior: recovery appeared as secondary status text followed by a
+  small borderless action that was difficult to discover among row metadata.
+- New behavior: the same existing states and action are grouped in a dedicated
+  SwiftUI recovery callout with symbol, title, explanation, prominent native
+  action, and a progress-only pending variant.
+- Evidence basis: owner-provided runtime screenshot, current SwiftUI ownership,
+  existing recovery action mapping, and an ImageGen layout reference used only
+  for information hierarchy.
+- Compatibility: visual and accessibility evolution only; persisted profiles,
+  authentication lifecycle, actions, and quota data remain compatible.
+- Protected domains: Desktop/session switching, credential-file handling,
+  profile isolation, quota semantics, account ordering/removal, share view, and
+  background polling.
+- QA and design impact: action-state unit coverage remains required; fresh-build
+  Computer Use acceptance must verify the callout and pending state in light and
+  dark appearances.
+- Specification paths changed: this plan and
+  `docs/specs/features/codex-account-status.md`.
+- Independent review: the fresh light-appearance popover was observed through
+  local macOS Accessibility and a screen capture on 2026-08-09. Formal Computer
+  Use observation was unavailable in the active tool surface; the pending
+  browser-sign-in state and dark appearance remain an explicit visual-acceptance
+  residual for owner review.
+- Contract revision: `codex-account-status` revision 3.
 
 ### Local data contract
 
