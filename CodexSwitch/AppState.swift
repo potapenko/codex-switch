@@ -45,17 +45,26 @@ final class AppState {
         do {
             executable = try configuredCodexCLI()
         } catch {
-            for profile in profiles {
-                recordFailure(error, for: profile.id)
-            }
+            let failures = Dictionary(uniqueKeysWithValues: profiles.map { profile in
+                (profile.id, profileAfterFailure(error, from: profile))
+            })
+            profiles = ProfileRefreshBatch.merging(failures, into: profiles)
+            persist()
             requestCLISettings()
             return
         }
         isRefreshing = true
         defer { isRefreshing = false }
-        for profile in profiles {
-            await refresh(profile: profile, executable: executable)
+        let requestedProfiles = profiles
+        var refreshedProfiles: [UUID: AccountProfile] = [:]
+        for profile in requestedProfiles {
+            refreshedProfiles[profile.id] = await refreshedProfile(
+                from: profile,
+                executable: executable
+            )
         }
+        profiles = ProfileRefreshBatch.merging(refreshedProfiles, into: profiles)
+        persist()
     }
 
     func configureCodexCLI(path: String) async throws {
@@ -117,7 +126,12 @@ final class AppState {
         defer { isRefreshing = false }
         do {
             let executable = try configuredCodexCLI()
-            await refresh(profile: profile, executable: executable)
+            let result = await refreshedProfile(from: profile, executable: executable)
+            profiles = ProfileRefreshBatch.merging(
+                [profile.id: result],
+                into: profiles
+            )
+            persist()
         } catch {
             recordFailure(error, for: profile.id)
         }
@@ -155,9 +169,6 @@ final class AppState {
             return
         }
 
-        update(profileID: profile.id) {
-            $0.snapshotState = .refreshing
-        }
         do {
             let snapshot = try await client.readSnapshot()
             update(profileID: profile.id) {
@@ -171,36 +182,29 @@ final class AppState {
         }
     }
 
-    private func refresh(profile: AccountProfile, executable: CodexCLIExecutable) async {
-        update(profileID: profile.id) {
-            $0.snapshotState = .refreshing
-            $0.lastError = nil
-        }
+    private func refreshedProfile(
+        from profile: AccountProfile,
+        executable: CodexCLIExecutable
+    ) async -> AccountProfile {
         let client = CodexAppServerClient()
         do {
             defer { Task { await client.stop() } }
             try await client.start(codexHome: try store.codexHome(for: profile), executable: executable)
             let snapshot = try await client.readSnapshot()
-            update(profileID: profile.id) {
-                $0.snapshot = snapshot
-                $0.label = snapshot.email ?? $0.label
-                $0.snapshotState = .fresh
-                $0.lastError = nil
-            }
+            var refreshedProfile = profile
+            refreshedProfile.snapshot = snapshot
+            refreshedProfile.label = snapshot.email ?? refreshedProfile.label
+            refreshedProfile.snapshotState = .fresh
+            refreshedProfile.lastError = nil
+            return refreshedProfile
         } catch {
-            recordFailure(error, for: profile.id)
+            return profileAfterFailure(error, from: profile)
         }
     }
 
     private func recordFailure(_ error: Error, for profileID: UUID) {
-        update(profileID: profileID) {
-            $0.lastError = error.localizedDescription
-            if let clientError = error as? CodexAppServerClient.ClientError,
-               case .signInRequired = clientError {
-                $0.snapshotState = .signInRequired
-            } else {
-                $0.snapshotState = $0.snapshot == nil ? .failed : .cached
-            }
+        update(profileID: profileID) { profile in
+            profile = profileAfterFailure(error, from: profile)
         }
     }
 
@@ -209,6 +213,21 @@ final class AppState {
             $0.lastError = error.localizedDescription
             $0.snapshotState = .signInRequired
         }
+    }
+
+    private func profileAfterFailure(
+        _ error: Error,
+        from profile: AccountProfile
+    ) -> AccountProfile {
+        var failedProfile = profile
+        failedProfile.lastError = error.localizedDescription
+        if let clientError = error as? CodexAppServerClient.ClientError,
+           case .signInRequired = clientError {
+            failedProfile.snapshotState = .signInRequired
+        } else {
+            failedProfile.snapshotState = failedProfile.snapshot == nil ? .failed : .cached
+        }
+        return failedProfile
     }
 
     private func update(profileID: UUID, change: (inout AccountProfile) -> Void) {
@@ -224,5 +243,20 @@ final class AppState {
 
     private func configuredCodexCLI() throws -> CodexCLIExecutable {
         try CodexCLIExecutable.resolve(path: codexCLIPath)
+    }
+}
+
+enum ProfileRefreshBatch {
+    static func merging(
+        _ refreshedProfiles: [UUID: AccountProfile],
+        into currentProfiles: [AccountProfile]
+    ) -> [AccountProfile] {
+        currentProfiles.map { currentProfile in
+            guard var refreshedProfile = refreshedProfiles[currentProfile.id] else {
+                return currentProfile
+            }
+            refreshedProfile.nickname = currentProfile.nickname
+            return refreshedProfile
+        }
     }
 }

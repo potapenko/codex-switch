@@ -153,6 +153,38 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertEqual(decodedProfiles.map(\.label), profiles.map(\.label))
     }
 
+    func testRefreshBatchPublishesTerminalProfilesWithoutRestoringRemovedRows() {
+        let first = AccountProfile(label: "First", nickname: "Pinned name", snapshotState: .cached)
+        let second = AccountProfile(label: "Second", snapshotState: .cached)
+        let addedDuringRefresh = AccountProfile(label: "Added during refresh")
+        let removedBeforeCompletion = AccountProfile(label: "Removed")
+
+        var refreshedFirst = first
+        refreshedFirst.label = "First updated"
+        refreshedFirst.nickname = "Stale name"
+        refreshedFirst.snapshotState = .fresh
+        var refreshedSecond = second
+        refreshedSecond.snapshotState = .signInRequired
+        var refreshedRemoved = removedBeforeCompletion
+        refreshedRemoved.snapshotState = .fresh
+
+        let published = ProfileRefreshBatch.merging(
+            [
+                first.id: refreshedFirst,
+                second.id: refreshedSecond,
+                removedBeforeCompletion.id: refreshedRemoved
+            ],
+            into: [second, first, addedDuringRefresh]
+        )
+
+        XCTAssertEqual(published.map(\.id), [second.id, first.id, addedDuringRefresh.id])
+        XCTAssertEqual(published[0].snapshotState, .signInRequired)
+        XCTAssertEqual(published[1].label, "First updated")
+        XCTAssertEqual(published[1].snapshotState, .fresh)
+        XCTAssertEqual(published[1].nickname, "Pinned name")
+        XCTAssertEqual(published[2], addedDuringRefresh)
+    }
+
     func testResetCreditBadgeKeepsZeroVisibleAndAccentsAvailableCredits() {
         let noCredits = ResetCredits(availableCount: 0, details: nil)
         let availableCredits = ResetCredits(availableCount: 1, details: nil)

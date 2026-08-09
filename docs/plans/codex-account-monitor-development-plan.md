@@ -261,6 +261,61 @@ interactive login.
   `docs/specs/features/codex-account-status.md`.
 - Contract revision: `codex-account-status` revision 4.
 
+### Contract Delta: temporally-stable-refresh-presentation-5
+
+- Change mode: Evolve.
+- Authorized by: owner request on 2026-08-09.
+- Domain and clauses: `codex-account-status`, on-open refresh presentation,
+  profile-row loading transitions, and loading feedback.
+- Pinned baseline: `codex-account-status` revision 4 and checkpoint `93879a5`.
+- Previous behavior: the outer popover size was pinned, but each sequential
+  profile request still changed the row to `.refreshing`, removing recovery,
+  error, or retry content and then restoring terminal content. Rows below it
+  therefore moved even though the popover frame stayed fixed.
+- New behavior: normal quota loading has one progress indicator in a permanent
+  header slot. Rows preserve their last terminal presentation while requests
+  run; `Refresh all` publishes collected terminal results in one observable
+  update; retry uses a fixed heading action slot instead of a conditional
+  vertical line.
+- Evidence basis: owner runtime observation; revision-4 Accessibility evidence
+  that proved only the outer frame; current `snapshotState` mutations and
+  conditional SwiftUI branches; and an ImageGen two-state reference whose idle
+  and refreshing layouts differ only by spinner visibility and disabled button
+  appearance.
+- Compatibility: visual/state-publication evolution only. Persisted profile
+  schema, cached snapshots, authentication lifecycle, returned quota semantics,
+  and external process boundaries remain compatible.
+- Protected domains: OAuth and reauthentication behavior, profile isolation,
+  credentials, quota/reset interpretation, order/removal semantics, share view,
+  Desktop/session switching, and background polling.
+- Permitted specification delta: one dashboard loading indicator, stable row
+  terminal presentation during normal refresh, atomic bulk-result publication,
+  a fixed retry action slot, and single-line middle-truncated account headings
+  that preserve their full accessible value.
+- Forbidden specification delta: hiding cached data, delaying persistence past
+  operation completion, changing provider calls, adding polling, or weakening
+  sign-in recovery.
+- Material decisions remaining: none; the owner explicitly requested fixed
+  elements and one unified loading mechanism.
+- Required evidence: state-publication tests, full macOS test gate, fresh-build
+  launch smoke, and time-sampled visual coordinates for the header, recovery
+  actions, and multiple rows during a real on-open refresh.
+- Runtime evidence: a fresh dark-appearance build was sampled forty times at
+  0.2-second intervals during a real on-open refresh on 2026-08-09. Samples
+  1–11 observed the disabled busy state and samples 12–40 observed idle. Every
+  sample retained the same `386 x 759` popover, `Refresh all` position and
+  size, and first three row frames (`332 x 174` at unchanged coordinates).
+  Busy and idle captures also show that only the fixed header spinner and
+  enabled appearance change; recovery callouts, quota metadata, actions, and
+  row positions remain present.
+- Visual-acceptance residual: formal Computer Use is unavailable in the active
+  tool surface. Accessibility sampling and screen captures provide supporting
+  runtime evidence but do not replace the still-incomplete Computer Use
+  acceptance required by this repository.
+- Specification paths changed: this plan and
+  `docs/specs/features/codex-account-status.md`.
+- Contract revision: `codex-account-status` revision 5.
+
 ### Local data contract
 
 Keep only:

@@ -17,10 +17,16 @@ struct ProfileRow: View {
         VStack(alignment: .leading, spacing: 5) {
             HStack {
                 profileName
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .layoutPriority(1)
+                    .help(displayName)
                 Spacer()
                 if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }
+                retryActionSlot
                 Button("Remove", role: .destructive, action: remove)
                     .buttonStyle(.borderless)
+                    .fixedSize()
             }
             if let snapshot = profile.snapshot {
                 if let primary = codexPrimaryWindow(in: snapshot), let usedPercent = primary.usedPercent {
@@ -47,16 +53,13 @@ struct ProfileRow: View {
                 Text(statusText).font(.footnote).foregroundStyle(.secondary)
             }
             if let recoveryMode {
-                ProfileRecoveryCallout(mode: recoveryMode, signIn: signIn)
+                ProfileRecoveryCallout(
+                    mode: recoveryMode,
+                    isActionEnabled: canSignIn,
+                    signIn: signIn
+                )
             } else if let error = profile.lastError {
                 Text(error).font(.footnote).foregroundStyle(.red)
-            }
-            if canRetry {
-                HStack {
-                    Spacer()
-                    Button("Retry", action: retry)
-                        .buttonStyle(.borderless)
-                }
             }
         }
         .onChange(of: areEmailsMasked) { _, isMasked in
@@ -118,6 +121,10 @@ struct ProfileRow: View {
         !isRefreshing && profile.supportsRetry
     }
 
+    private var showsRetry: Bool {
+        profile.supportsRetry
+    }
+
     private var canSignIn: Bool {
         !isRefreshing && profile.supportsSignIn
     }
@@ -154,11 +161,21 @@ struct ProfileRow: View {
         switch profile.snapshotState {
         case .fresh: "Fresh snapshot"
         case .cached: "Cached snapshot"
-        case .refreshing: "Refreshing…"
+        case .refreshing: "Quota status is unavailable."
         case .signingIn: "Finish signing in in your browser…"
         case .signInRequired: "Sign in to load quota status."
         case .failed: "Quota status is unavailable."
         }
+    }
+
+    private var retryActionSlot: some View {
+        Button("Retry", action: retry)
+            .buttonStyle(.borderless)
+            .disabled(!canRetry)
+            .opacity(showsRetry ? 1 : 0)
+            .allowsHitTesting(showsRetry)
+            .accessibilityHidden(!showsRetry)
+            .frame(width: 36, alignment: .trailing)
     }
 
     private func quotaLine(primary: QuotaWindow, usedPercent: Double) -> some View {

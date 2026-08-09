@@ -7,6 +7,7 @@ enum ProfileRecoveryMode: Equatable {
 
 struct ProfileRecoveryCallout: View {
     let mode: ProfileRecoveryMode
+    let isActionEnabled: Bool
     let signIn: () -> Void
     @Environment(\.colorScheme) private var colorScheme
 
@@ -57,6 +58,7 @@ struct ProfileRecoveryCallout: View {
                 .controlSize(.regular)
                 .tint(.orange)
                 .fixedSize(horizontal: true, vertical: false)
+                .disabled(!isActionEnabled)
                 .accessibilityHint("Opens the browser sign-in for this account")
         }
     }

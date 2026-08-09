@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 4
+- **Contract revision:** 5
 - **Authority:** Active
-- **Stability:** Released through v1.0.4; popover refresh geometry and reauthentication recovery presentation evolving
+- **Stability:** Released through v1.0.4; temporally stable refresh presentation evolving
 
 ## Goal
 
@@ -37,7 +37,11 @@ separately authenticated ChatGPT accounts.
 - The menu button opens a compact list of profiles. A profile shows its email
   label, plan when available, the remaining percentage for the `codex` primary
   quota, its next reset as a calendar date and time, and the last successful
-  refresh. The raw used percentage is retained for accessibility only.
+  refresh. The profile heading remains one line so long account labels cannot
+  change row height when trailing actions are present; a constrained label is
+  truncated in the middle while its full value remains available to
+  accessibility and pointer help. The raw used percentage is retained for
+  accessibility only.
 - Profiles are presented in a native macOS reorderable list. The owner can
   drag any non-control area of a row to move it; no custom drag handle or
   custom drop target is shown. The chosen order is saved with the local
@@ -56,6 +60,20 @@ separately authenticated ChatGPT accounts.
   bounded scrollable list. A later popover presentation may size itself from
   the then-current stable profile content. Adding or removing a profile while
   the popover is open may intentionally recalculate the viewport.
+- The header reserves a fixed-size slot immediately before **Refresh all** for
+  one native indeterminate progress indicator. The slot remains part of the
+  layout while idle and only the indicator's visibility changes. While any
+  quota refresh is active, that single indicator communicates loading and
+  **Refresh all** keeps its normal position and size in a disabled state. The
+  list shows no per-row spinner, skeleton, shimmer, or **Refreshing…** text.
+- A normal quota refresh preserves every row's last terminal presentation for
+  the duration of the request: quota metadata, recovery callouts, errors, and
+  action slots do not disappear or change position as individual profiles are
+  processed. **Refresh all** applies its collected terminal results to the
+  profile list in one observable update after all requested profiles finish,
+  rather than exposing sequential intermediate row states. Changed terminal
+  values may update once at completion, but transient loading state must never
+  repeatedly remove and restore row content.
 - The bottom action bar contains **Add account** and **Quit**. **Quit**
   terminates CodexSwitch only; it does not start, stop, switch, or otherwise
   change any Codex account or desktop session.
@@ -130,7 +148,9 @@ separately authenticated ChatGPT accounts.
   last successful snapshot visible and gives that profile a short status.
 - A failed or cached profile exposes a per-row **Retry** action. It refreshes
   only that profile and never removes its last good snapshot. A retry has no
-  account-switching side effect.
+  account-switching side effect. The action occupies a fixed trailing action
+  slot in the profile heading instead of adding a conditional vertical row, so
+  enabling, disabling, or clearing it does not move quota metadata below it.
 - Every normal profile refresh asks the managed ChatGPT app-server to refresh
   its token before reading quotas. Codex owns that refresh lifecycle; the app
   never reads, stores, or refreshes OAuth tokens itself.
@@ -199,11 +219,16 @@ separately authenticated ChatGPT accounts.
   title, and description). The opaque credit ID is deliberately discarded:
   phase 1 never redeems a credit. `availableCount` remains authoritative when
   the service caps the detail rows.
-- Each profile is visibly in exactly one product-language state: **fresh**
-  after a successful refresh, **cached** when an earlier snapshot is retained,
-  **refreshing** while a quota request is active, **signing in** while a browser
-  login is pending, **sign-in required** when no usable authentication exists,
-  or **failed** when a refresh without a snapshot fails. A fresh snapshot
+- Each profile is visibly in exactly one terminal product-language state:
+  **fresh** after a successful refresh, **cached** when an earlier snapshot is
+  retained, **signing in** while a browser login is pending, **sign-in
+  required** when no usable authentication exists, or **failed** when a
+  refresh without a snapshot fails. Normal quota loading is a dashboard-level
+  activity represented by the fixed header progress indicator; it does not
+  replace an individual row's terminal presentation. The persisted
+  `refreshing` value remains a backward-compatible transient model value and
+  restores to cached or sign-in-required on relaunch, but is not a row-level
+  presentation. A fresh snapshot
   becomes cached after relaunch until the next successful refresh. Relaunching
   during a pending browser login restores **sign-in required**. A failed
   refresh or sign-in never removes the last good snapshot.
@@ -253,6 +278,7 @@ separately authenticated ChatGPT accounts.
 - `xcodebuild ... test` covers the build/test gate.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.
 - Computer Use acceptance observes the dedicated callout, its prominent action,
-  the stable on-open refresh geometry, and the pending browser-sign-in
-  presentation in the freshly built popover; light and dark appearances retain
-  readable contrast and hierarchy.
+  the fixed global loading indicator, unchanged coordinates for row content
+  throughout on-open refresh, and the pending browser-sign-in presentation in
+  the freshly built popover; light and dark appearances retain readable
+  contrast and hierarchy.

@@ -36,6 +36,7 @@ struct MenuBarView: View {
                 .buttonStyle(.borderless)
                 .help("Codex CLI settings")
                 .accessibilityLabel("Codex CLI settings")
+                refreshActivityIndicator
                 Button("Refresh all") {
                     Task { await appState.refreshAll() }
                 }
@@ -138,5 +139,16 @@ struct MenuBarView: View {
         case .fresh, .cached, .refreshing, .failed:
             104
         }
+    }
+
+    private var refreshActivityIndicator: some View {
+        ZStack {
+            if appState.isRefreshing {
+                ProgressView()
+                    .controlSize(.small)
+                    .accessibilityLabel("Refreshing account data")
+            }
+        }
+        .frame(width: 16, height: 16)
     }
 }
