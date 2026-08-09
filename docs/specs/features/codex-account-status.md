@@ -2,7 +2,7 @@
 
 - **Contract revision:** 6
 - **Authority:** Active
-- **Stability:** Released through v1.0.4; screen-bounded popover presentation evolving
+- **Stability:** Released through v1.0.5
 
 ## Goal
 

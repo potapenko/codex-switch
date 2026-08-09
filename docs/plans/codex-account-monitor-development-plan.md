@@ -514,3 +514,26 @@ switch action.
 
 - Should a profile row show a partial email, a local nickname, or both when
   the menu is visible during screen sharing?
+
+## Release Contract Baseline: v1.0.5
+
+- **Release:** `v1.0.5`, build `12`, published 2026-08-09.
+- **Implementation revision:** `5a80078f583376c497a2f3ec9fbaa10dda00e8e5`.
+- **Specification revisions:** `codex-account-status` revision 6 and the
+  active direct-distribution contract.
+- **Included domains:** existing-profile reauthentication, dedicated SwiftUI
+  sign-in recovery, temporally stable refresh presentation, and the
+  screen-bounded profile list, plus all behavior released through `v1.0.4`.
+- **QA and runtime evidence:** 17 macOS tests passed locally and on GitHub
+  Actions; workflow run `31332348549` archived, signed, notarized, stapled,
+  and verified the app and DMG before publication. Independent download
+  verification passed the published checksums, manifest, `codesign`, stapler,
+  Gatekeeper, and DMG-layout checks.
+- **Compatibility and migration:** backward-compatible with existing profile
+  metadata, cached snapshots, isolated `CODEX_HOME` directories, and Codex CLI
+  configuration; no migration is required.
+- **Known exclusions and residuals:** automatic background polling and Desktop
+  Codex account switching remain out of scope. The formal Computer Use visual
+  acceptance residual recorded for revisions 3–6 remains explicit; supporting
+  fresh-build Accessibility sampling and screen captures are recorded in their
+  respective Contract Deltas.
