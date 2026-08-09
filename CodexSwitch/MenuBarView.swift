@@ -5,6 +5,14 @@ struct MenuBarView: View {
     @Bindable var appState: AppState
     @State private var areEmailsMasked = false
     @State private var isCLISettingsVisible = false
+    @State private var profileListViewportHeight: CGFloat
+
+    init(appState: AppState) {
+        self.appState = appState
+        _profileListViewportHeight = State(
+            initialValue: Self.desiredProfileListHeight(for: appState.profiles)
+        )
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -76,7 +84,7 @@ struct MenuBarView: View {
                 }
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
-                .frame(height: profileListHeight)
+                .frame(height: profileListViewportHeight)
             }
 
             Divider()
@@ -97,19 +105,34 @@ struct MenuBarView: View {
                 isCLISettingsVisible = true
             }
         }
+        .onChange(of: appState.profiles.count) {
+            profileListViewportHeight = desiredProfileListHeight
+        }
+        .onChange(of: desiredProfileListHeight) { _, newHeight in
+            guard !appState.isPopoverPresented else { return }
+            profileListViewportHeight = newHeight
+        }
+        .onChange(of: appState.isPopoverPresented) { _, isPresented in
+            guard !isPresented else { return }
+            profileListViewportHeight = desiredProfileListHeight
+        }
     }
 
-    private var profileListHeight: CGFloat {
-        let contentHeight = appState.profiles.reduce(CGFloat.zero) { height, profile in
+    private var desiredProfileListHeight: CGFloat {
+        Self.desiredProfileListHeight(for: appState.profiles)
+    }
+
+    private static func desiredProfileListHeight(for profiles: [AccountProfile]) -> CGFloat {
+        let contentHeight = profiles.reduce(CGFloat.zero) { height, profile in
             height + estimatedHeight(for: profile)
         }
         return min(contentHeight, 620)
     }
 
-    private func estimatedHeight(for profile: AccountProfile) -> CGFloat {
+    private static func estimatedHeight(for profile: AccountProfile) -> CGFloat {
         switch profile.snapshotState {
         case .signInRequired:
-            profile.snapshot == nil ? 138 : 174
+            profile.snapshot == nil ? 104 : 164
         case .signingIn:
             profile.snapshot == nil ? 92 : 140
         case .fresh, .cached, .refreshing, .failed:

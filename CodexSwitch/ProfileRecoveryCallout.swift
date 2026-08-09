@@ -33,32 +33,31 @@ struct ProfileRecoveryCallout: View {
     }
 
     private func signInRequiredContent(hasCachedSnapshot: Bool) -> some View {
-        HStack(alignment: .top, spacing: 10) {
+        HStack(alignment: .center, spacing: 10) {
             Image(systemName: "exclamationmark.circle.fill")
                 .font(.title3)
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(.orange)
                 .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 7) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Sign-in required")
-                        .font(.subheadline.weight(.semibold))
-                    Text(explanation(hasCachedSnapshot: hasCachedSnapshot))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Sign-in required")
+                    .font(.subheadline.weight(.semibold))
+                Text(explanation(hasCachedSnapshot: hasCachedSnapshot))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .layoutPriority(1)
 
-                Button(action: signIn) {
-                    Label("Sign in again", systemImage: "person.crop.circle.badge.checkmark")
-                        .frame(maxWidth: .infinity)
-                }
+            Spacer(minLength: 6)
+
+            Button("Sign in again", action: signIn)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.regular)
                 .tint(.orange)
+                .fixedSize(horizontal: true, vertical: false)
                 .accessibilityHint("Opens the browser sign-in for this account")
-            }
         }
     }
 

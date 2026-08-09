@@ -69,6 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     func popoverDidClose(_ notification: Notification) {
+        appState.setPopoverPresented(false)
         removeOutsideClickMonitor()
     }
 
@@ -76,11 +77,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         if popover.isShown {
             closePopover()
         } else {
+            appState.setPopoverPresented(true)
+            popover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
+            if !popover.isShown {
+                appState.setPopoverPresented(false)
+                return
+            }
+            installOutsideClickMonitor()
             Task {
                 await appState.refreshAll()
             }
-            popover.show(relativeTo: sender.bounds, of: sender, preferredEdge: .minY)
-            installOutsideClickMonitor()
         }
     }
 

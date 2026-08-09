@@ -216,6 +216,51 @@ interactive login.
   residual for owner review.
 - Contract revision: `codex-account-status` revision 3.
 
+### Contract Delta: stable-popover-recovery-layout-4
+
+- Change mode: Evolve.
+- Authorized by: owner request on 2026-08-09.
+- Domain and clauses: `codex-account-status`, on-open popover geometry and the
+  user-visible **sign-in required** / **signing in** recovery presentation.
+- Pinned baseline: released behavior plus `codex-account-status` revision 3 and
+  checkpoint `d8893f5`.
+- Previous behavior: the list viewport was recomputed from each profile's live
+  refresh state, so sequential refresh completion could resize the popover; the
+  recovery action also stretched across the callout beneath its explanation.
+- New behavior: a presentation pins its list viewport before refresh results
+  arrive, keeping the outer geometry, header, and footer stable. Recovery uses
+  a compact horizontal SwiftUI composition with flexible symbol/text at the
+  leading edge and one intrinsic-width action at the trailing edge.
+- Evidence basis: owner-provided runtime observation and screenshot; current
+  `NSHostingController` preferred-size ownership; state-dependent list-height
+  estimates; sequential per-profile refresh implementation; and a refined
+  ImageGen reference used only for information hierarchy and spacing.
+- Permitted specification delta: presentation-time viewport stability,
+  scroll containment for refreshed content, intentional recalculation after
+  profile-count changes, and horizontal recovery-callout composition.
+- Protected domains: authentication and refresh lifecycle, persisted profiles,
+  quota semantics, Desktop/session switching, credential-file handling,
+  profile isolation, ordering/removal semantics, share view, and background
+  polling.
+- Material decisions remaining: none; the owner selected stable geometry and
+  the horizontal ImageGen composition explicitly.
+- Required evidence: focused layout/state unit coverage where practical, full
+  macOS test gate, fresh-build launch smoke, and visual observation that
+  sequential state updates do not resize the open popover and that **Sign in
+  again** remains compact at the trailing edge.
+- Runtime evidence: the fresh light-appearance build was opened through macOS
+  Accessibility on 2026-08-09. Thirty samples across twelve seconds retained
+  the same popover position and `386 x 759` size while the on-open refresh ran;
+  the captured callouts kept their explanation at the leading edge and one
+  intrinsic-width **Sign in again** button at the trailing edge.
+- Visual-acceptance residual: formal Computer Use was unavailable in the active
+  tool surface, so the required Computer Use observation remains incomplete;
+  macOS Accessibility and a screen capture were used as supporting evidence,
+  not represented as a substitute.
+- Specification paths changed: this plan and
+  `docs/specs/features/codex-account-status.md`.
+- Contract revision: `codex-account-status` revision 4.
+
 ### Local data contract
 
 Keep only:

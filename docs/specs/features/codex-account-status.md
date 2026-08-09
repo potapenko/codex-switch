@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 3
+- **Contract revision:** 4
 - **Authority:** Active
-- **Stability:** Released through v1.0.4; reauthentication recovery presentation evolving
+- **Stability:** Released through v1.0.4; popover refresh geometry and reauthentication recovery presentation evolving
 
 ## Goal
 
@@ -49,6 +49,13 @@ separately authenticated ChatGPT accounts.
   action controls stay visible, and no profile-count limit is imposed. The
   profile list background is transparent so the popover material remains
   visible behind the rows; it is never an opaque white panel.
+- Each popover presentation establishes its list viewport before the on-open
+  refresh starts. Intermediate and completed per-profile refresh states do not
+  resize the outer popover or vertically move its header and footer while it is
+  open. If refreshed row content needs more space, it remains inside the
+  bounded scrollable list. A later popover presentation may size itself from
+  the then-current stable profile content. Adding or removing a profile while
+  the popover is open may intentionally recalculate the viewport.
 - The bottom action bar contains **Add account** and **Quit**. **Quit**
   terminates CodexSwitch only; it does not start, stop, switch, or otherwise
   change any Codex account or desktop session.
@@ -140,6 +147,11 @@ separately authenticated ChatGPT accounts.
   never relies on colour alone to communicate the state. When a cached snapshot
   exists, the explanation makes clear that cached data remains visible; when no
   snapshot exists, it explains that sign-in is needed to load quota status.
+  At the normal popover width, symbol and explanation form a flexible leading
+  group while the button keeps its intrinsic width at the trailing edge in the
+  same horizontal callout. The recovery button never stretches across the row
+  or popover width. A stacked fallback is allowed only when accessibility text
+  sizing or a narrower supported presentation cannot preserve legibility.
 - **Sign in again** starts the normal managed ChatGPT browser login in that
   profile's existing isolated `CODEX_HOME`. It never creates a replacement
   profile, changes the profile ID, order, or local account name, or imports
@@ -241,5 +253,6 @@ separately authenticated ChatGPT accounts.
 - `xcodebuild ... test` covers the build/test gate.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.
 - Computer Use acceptance observes the dedicated callout, its prominent action,
-  and the pending browser-sign-in presentation in the freshly built popover;
-  light and dark appearances retain readable contrast and hierarchy.
+  the stable on-open refresh geometry, and the pending browser-sign-in
+  presentation in the freshly built popover; light and dark appearances retain
+  readable contrast and hierarchy.

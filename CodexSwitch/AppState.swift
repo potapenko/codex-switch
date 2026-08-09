@@ -8,6 +8,7 @@ final class AppState {
     private let codexCLIPathStore = CodexCLIPathStore()
     private(set) var profiles: [AccountProfile]
     private(set) var isRefreshing = false
+    private(set) var isPopoverPresented = false
     private(set) var codexCLIPath: String?
     private(set) var isCLISettingsRequested = false
     private var shouldAddAccountAfterCLIConfiguration = false
@@ -32,6 +33,10 @@ final class AppState {
         profiles.append(profile)
         persist()
         await loginAndRefresh(profile: profile, executable: executable)
+    }
+
+    func setPopoverPresented(_ isPresented: Bool) {
+        isPopoverPresented = isPresented
     }
 
     func refreshAll() async {
