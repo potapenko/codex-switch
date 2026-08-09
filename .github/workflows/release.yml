@@ -133,7 +133,12 @@ jobs:
         run: |
           set -euo pipefail
           notes="$RUNNER_TEMP/release-notes.md"
-          printf '# CodexSwitch %s\n\nSigned and notarized macOS release.\n' "$VERSION" > "$notes"
+          repository_notes="docs/release-notes/v${VERSION}.md"
+          if [ -f "$repository_notes" ]; then
+            cp "$repository_notes" "$notes"
+          else
+            printf '# CodexSwitch %s\n\nSigned and notarized macOS release.\n' "$VERSION" > "$notes"
+          fi
           assets=(
             "$RELEASE_DIR/CodexSwitch-$VERSION.dmg"
             "$RELEASE_DIR/CodexSwitch-$VERSION.zip"
