@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0E65720D0B05F74E0AA9DC55 /* CodexAppServerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7D84046F76434C375539E35 /* CodexAppServerClient.swift */; };
+		1A6D3E4F5061728394A5B6C7 /* BackgroundRefreshPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7B6A594837261504F3E2D1C /* BackgroundRefreshPolicy.swift */; };
 		2C375FAEB88F13787055ECA4 /* CodexSwitchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6159185AEFE61C566F8B1B8 /* CodexSwitchApp.swift */; };
 		3BDCA189F91A9CFF215BB831 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7715C76DFE7EE431CE6AE883 /* Assets.xcassets */; };
 		534396843460D1119A27F748 /* QuotaResponseDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E1C669C77572CC6FD2173B /* QuotaResponseDecoder.swift */; };
@@ -35,6 +36,7 @@
 
 /* Begin PBXFileReference section */
 		1F051BB61E1EE422F2478113 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C7B6A594837261504F3E2D1C /* BackgroundRefreshPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefreshPolicy.swift; sourceTree = "<group>"; };
 		35060837266A920701E45282 /* CodexCLISettingsDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexCLISettingsDialog.swift; sourceTree = "<group>"; };
 		7715C76DFE7EE431CE6AE883 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 		C4AC2198B6F5702818CFD5E7 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				C7B6A594837261504F3E2D1C /* BackgroundRefreshPolicy.swift */,
 				D7D84046F76434C375539E35 /* CodexAppServerClient.swift */,
 				F9A8E61B2E4667849D4092FA /* CodexCLIConfiguration.swift */,
 				9502FB9EA23E9C0D2C3806BC /* ProfileStore.swift */,
@@ -211,6 +214,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F21612A890AB334B94E7AE8A /* AccountProfile.swift in Sources */,
+				1A6D3E4F5061728394A5B6C7 /* BackgroundRefreshPolicy.swift in Sources */,
 				6AA91AACEFB0032619B8E986 /* AppState.swift in Sources */,
 				0E65720D0B05F74E0AA9DC55 /* CodexAppServerClient.swift in Sources */,
 				D82ED3B3ED75097827B43E6D /* CodexCLIConfiguration.swift in Sources */,

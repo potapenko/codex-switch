@@ -196,6 +196,38 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertEqual(published[2], addedDuringRefresh)
     }
 
+    func testBackgroundRefreshPolicyUsesSixHourBoundaryAndSkipsInteractiveRecovery() {
+        let checkTime = Date(timeIntervalSince1970: 100_000)
+        let recent = AccountProfile(
+            label: "Recent",
+            snapshot: snapshot(refreshedAt: checkTime.addingTimeInterval(-21_599)),
+            snapshotState: .fresh
+        )
+        let boundary = AccountProfile(
+            label: "Boundary",
+            snapshot: snapshot(refreshedAt: checkTime.addingTimeInterval(-21_600)),
+            snapshotState: .cached
+        )
+        let neverLoaded = AccountProfile(label: "Never loaded", snapshotState: .failed)
+        let signInRequired = AccountProfile(
+            label: "Needs sign-in",
+            snapshot: snapshot(refreshedAt: checkTime.addingTimeInterval(-43_200)),
+            snapshotState: .signInRequired
+        )
+        let signingIn = AccountProfile(label: "Signing in", snapshotState: .signingIn)
+        let profiles = [recent, boundary, neverLoaded, signInRequired, signingIn]
+
+        XCTAssertEqual(BackgroundRefreshPolicy.interval, .seconds(21_600))
+        XCTAssertEqual(
+            BackgroundRefreshPolicy.eligibleProfiles(in: profiles).map(\.id),
+            [recent.id, boundary.id, neverLoaded.id]
+        )
+        XCTAssertEqual(
+            BackgroundRefreshPolicy.dueProfiles(in: profiles, now: checkTime).map(\.id),
+            [boundary.id, neverLoaded.id]
+        )
+    }
+
     func testResetCreditBadgeKeepsZeroVisibleAndAccentsAvailableCredits() {
         let noCredits = ResetCredits(availableCount: 0, details: nil)
         let availableCredits = ResetCredits(availableCount: 1, details: nil)
@@ -204,5 +236,15 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertFalse(noCredits.hasAvailableCredits)
         XCTAssertEqual(availableCredits.badgeTone, .available)
         XCTAssertTrue(availableCredits.hasAvailableCredits)
+    }
+
+    private func snapshot(refreshedAt: Date) -> AccountSnapshot {
+        AccountSnapshot(
+            email: nil,
+            plan: nil,
+            buckets: [],
+            resetCredits: nil,
+            refreshedAt: refreshedAt
+        )
     }
 }

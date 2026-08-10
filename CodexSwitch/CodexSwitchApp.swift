@@ -25,6 +25,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private let popover = NSPopover()
     private var outsideClickMonitor: Any?
     private var workspaceActivationObserver: NSObjectProtocol?
+    private var systemWakeObserver: NSObjectProtocol?
+    private var periodicRefreshTask: Task<Void, Never>?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let controller = NSHostingController(
@@ -47,6 +49,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
                 self?.closePopover()
             }
         }
+        systemWakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                await self?.appState.refreshDueProfiles()
+            }
+        }
 
         let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         let statusIcon = NSImage(named: "StatusIcon")
@@ -59,7 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         statusItem.button?.action = #selector(togglePopover(_:))
         statusItem.button?.sendAction(on: [.leftMouseUp])
         self.statusItem = statusItem
-
+        startPeriodicRefresh()
     }
 
     func applicationDidResignActive(_ notification: Notification) {
@@ -67,9 +78,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        periodicRefreshTask?.cancel()
+        periodicRefreshTask = nil
         removeOutsideClickMonitor()
         if let workspaceActivationObserver {
             NSWorkspace.shared.notificationCenter.removeObserver(workspaceActivationObserver)
+        }
+        if let systemWakeObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(systemWakeObserver)
         }
     }
 
@@ -102,6 +118,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private func closePopover() {
         popover.performClose(nil)
         removeOutsideClickMonitor()
+    }
+
+    private func startPeriodicRefresh() {
+        periodicRefreshTask?.cancel()
+        periodicRefreshTask = Task { [weak self] in
+            await self?.appState.refreshDueProfiles()
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: BackgroundRefreshPolicy.interval)
+                } catch {
+                    return
+                }
+                await self?.appState.refreshEligibleProfiles()
+            }
+        }
     }
 
     private func installOutsideClickMonitor() {

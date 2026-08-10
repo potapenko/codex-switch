@@ -39,10 +39,15 @@ Reference: [Codex App Server auth and rate limits](https://learn.chatgpt.com/doc
 
 Managed ChatGPT mode makes Codex responsible for persisting and automatically
 refreshing OAuth tokens. CodexSwitch also requests a forced managed-token
-refresh through `account/read` before reading quotas. If Codex reports that the
-managed credentials are no longer usable, polling or a second quota retry
-cannot repair them; the supported recovery is another `account/login/start`
-browser flow in the same isolated profile home.
+refresh through `account/read` before reading quotas. Starting with contract
+revision 7, an app-level scheduler performs that existing refresh path for all
+eligible profiles every six hours while CodexSwitch is running, and on launch
+or system wake when the last successful snapshot is at least six hours old.
+This is a preventative health check rather than a guarantee that a session
+cannot expire.
+If Codex reports that the managed credentials are no longer usable, polling or
+a second quota retry cannot repair them; the supported recovery is another
+`account/login/start` browser flow in the same isolated profile home.
 
 ### Cancelled scope: account/session switching
 
@@ -129,8 +134,9 @@ Rules:
   data, login required, refresh in progress, and refresh failure. “Current” in
   phase 1 means the profile marked as active in CodexSwitch's local display;
   it does **not** claim to be the account in a separately running ChatGPT app.
-- Refresh is explicit through **Refresh all** and per-row retry. Automatic
-  polling is deferred until battery/network policy is agreed.
+- Refresh remains explicit through **Refresh all** and per-row retry, and the
+  app also performs the accepted low-frequency six-hour refresh cycle while its
+  process is running. The scheduler does not overlap explicit refreshes.
 - Clicking a row in phase 1 opens its detail in the same popover only; it has
   no account-switching side effect.
 
@@ -167,10 +173,10 @@ allowed.
    action with a progress indicator. Amber/orange is a restrained recovery cue;
    destructive red and small borderless recovery links are not used.
 
-Automatic background polling remains out of this change. Opening the popover,
-**Refresh all**, and per-row **Retry** continue to request current data and the
-managed token refresh; polling does not repair credentials that require a new
-interactive login.
+Opening the popover, **Refresh all**, per-row **Retry**, and the six-hour
+scheduler all use the same managed token-refresh path. Scheduled work skips
+profiles that already require interactive login because polling cannot repair
+those credentials.
 
 ### Contract Delta: account-reauthentication-2
 
@@ -359,6 +365,43 @@ interactive login.
   `docs/specs/features/codex-account-status.md`.
 - Contract revision: `codex-account-status` revision 6.
 
+### Contract Delta: six-hour-managed-refresh-7
+
+- Change mode: Evolve.
+- Authorized by: owner request on 2026-08-10.
+- Domain and clauses: `codex-account-status`, managed-token refresh lifecycle,
+  launch lifecycle, and system-wake recovery.
+- Pinned baseline: released v1.0.5 and `codex-account-status` revision 6.
+- Previous behavior: account and quota refresh occurred only when the popover
+  opened or the owner chose **Refresh all**, **Retry**, or **Sign in again**.
+- New behavior: while CodexSwitch runs, one non-overlapping scheduler refreshes
+  every eligible profile once every six hours. Launch and system wake refresh
+  only profiles whose last successful snapshot is at least six hours old or
+  absent.
+- Authentication boundary: scheduled work reuses
+  `account/read(refreshToken: true)` and `account/rateLimits/read`; CodexSwitch
+  never reads, stores, or directly rotates OAuth credentials.
+- Recovery boundary: **sign-in required** and **signing in** profiles are not
+  polled. A managed credential that can no longer refresh still requires the
+  existing interactive **Sign in again** browser flow.
+- Compatibility: additive lifecycle evolution with no persisted-schema, quota,
+  layout, profile-order, or account-removal changes. Scheduled work stops while
+  the app is quit or the Mac sleeps and resumes with a due check after launch or
+  wake.
+- Protected domains: visible SwiftUI layout and loading stability, Desktop
+  session switching, credential files, profile isolation, quota semantics,
+  explicit refresh controls, and reauthentication behavior.
+- Required evidence: focused six-hour policy tests, full macOS test gate,
+  bounded launch smoke, and fresh runtime observation that launch/on-open work
+  remains non-overlapping and the existing popover presentation is unchanged.
+- Verification evidence: 18 macOS tests passed on 2026-08-10, including the
+  six-hour boundary and interactive-recovery exclusions. A fresh Debug bundle
+  passed `script/build_and_run.sh --verify`; Computer Use then opened that exact
+  bundle's popover and observed all five profiles in a completed `Updated just
+  now` state, no progress indicator, unchanged compact rows, and enabled
+  explicit controls after the launch/on-open refresh completed.
+- Contract revision: `codex-account-status` revision 7.
+
 ### Local data contract
 
 Keep only:
@@ -476,8 +519,9 @@ that mode for the switcher.
 1. Implement the flat account-row layout above; no separate main window.
 2. Make remaining/quota/reset semantics accessible through VoiceOver labels.
 3. Add per-row refresh and error recovery, including **Sign in again** for an
-   existing profile whose managed credentials cannot be refreshed. Keep
-   automatic background polling off.
+   existing profile whose managed credentials cannot be refreshed. Revision 7
+   later adds the accepted six-hour scheduler without changing the
+   explicit recovery flow.
 4. Add local label editing and profile ordering through a native, bounded
    scrollable macOS list for an unbounded number of profiles.
 
@@ -532,8 +576,9 @@ switch action.
 - **Compatibility and migration:** backward-compatible with existing profile
   metadata, cached snapshots, isolated `CODEX_HOME` directories, and Codex CLI
   configuration; no migration is required.
-- **Known exclusions and residuals:** automatic background polling and Desktop
-  Codex account switching remain out of scope. The formal Computer Use visual
+- **Known exclusions and residuals:** automatic background polling was not part
+  of v1.0.5 and Desktop Codex account switching remains out of scope. The
+  formal Computer Use visual
   acceptance residual recorded for revisions 3–6 remains explicit; supporting
   fresh-build Accessibility sampling and screen captures are recorded in their
   respective Contract Deltas.

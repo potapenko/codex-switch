@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 6
+- **Contract revision:** 7
 - **Authority:** Active
-- **Stability:** Released through v1.0.5
+- **Stability:** Released through v1.0.5; revision 7 evolving
 
 ## Goal
 
@@ -163,6 +163,19 @@ separately authenticated ChatGPT accounts.
 - Every normal profile refresh asks the managed ChatGPT app-server to refresh
   its token before reading quotas. Codex owns that refresh lifecycle; the app
   never reads, stores, or refreshes OAuth tokens itself.
+- While CodexSwitch remains running, one app-level scheduler refreshes every
+  eligible profile once every six hours. It uses the same managed-token and
+  quota request path as an explicit refresh. Launching the app and waking the
+  Mac perform a due check: a profile is due when it has no snapshot or its last
+  successful snapshot is at least six hours old, so a recent snapshot does not
+  cause an unnecessary launch or wake request. The scheduler never overlaps
+  another refresh.
+- Periodic refresh is preventative account-health and quota maintenance, not a
+  promise that a managed ChatGPT session cannot expire. Profiles already in
+  **sign-in required** or **signing in** are not retried by the scheduler; only
+  the existing interactive browser flow can recover unusable credentials.
+  Sleeping or quitting CodexSwitch stops scheduled work until the next wake or
+  launch due check.
 - When managed credentials can no longer be refreshed, the row retains its
   last successful snapshot and enters **sign-in required**. It presents a
   per-row **Sign in again** action instead of **Retry**. The status is a compact
@@ -205,9 +218,10 @@ separately authenticated ChatGPT accounts.
   The action remains available during a refresh; any already-running refresh
   for the removed profile discards its later result.
 - Opening the menu starts one **Refresh all** operation before the owner reads
-  the rows, so the menu normally presents the latest available state. This is
-  an on-open refresh, not background polling; repeated opening while a refresh
-  is already running does not start a duplicate operation.
+  the rows, so the menu normally presents the latest available state. Repeated
+  opening while a refresh is already running does not start a duplicate
+  operation. The six-hour scheduler follows the same no-overlap rule and does
+  not replace the explicit controls.
 - The popover closes when the owner clicks outside it, including when another
   application or window becomes active.
 - The app never redeems a reset credit; it may display the available count.
@@ -283,7 +297,9 @@ separately authenticated ChatGPT accounts.
 ## Verification mapping
 
 - Unit tests cover profile persistence, returned-quota decoding, and the
-  retry/sign-in action mapping for every recovery state.
+  retry/sign-in action mapping for every recovery state. Focused policy tests
+  cover the six-hour boundary, launch/wake staleness selection, and exclusion
+  of interactive recovery states from periodic refresh.
 - `xcodebuild ... test` covers the build/test gate.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.
 - Computer Use acceptance observes the dedicated callout, its prominent action,

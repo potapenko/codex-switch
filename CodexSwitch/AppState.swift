@@ -40,22 +40,45 @@ final class AppState {
     }
 
     func refreshAll() async {
+        await refresh(profiles, requestCLISettingsOnFailure: true)
+    }
+
+    func refreshEligibleProfiles() async {
+        await refresh(
+            BackgroundRefreshPolicy.eligibleProfiles(in: profiles),
+            requestCLISettingsOnFailure: false
+        )
+    }
+
+    func refreshDueProfiles(now: Date = Date()) async {
+        await refresh(
+            BackgroundRefreshPolicy.dueProfiles(in: profiles, now: now),
+            requestCLISettingsOnFailure: false
+        )
+    }
+
+    private func refresh(
+        _ requestedProfiles: [AccountProfile],
+        requestCLISettingsOnFailure: Bool
+    ) async {
+        guard !requestedProfiles.isEmpty else { return }
         guard !isRefreshing else { return }
         let executable: CodexCLIExecutable
         do {
             executable = try configuredCodexCLI()
         } catch {
-            let failures = Dictionary(uniqueKeysWithValues: profiles.map { profile in
+            let failures = Dictionary(uniqueKeysWithValues: requestedProfiles.map { profile in
                 (profile.id, profileAfterFailure(error, from: profile))
             })
             profiles = ProfileRefreshBatch.merging(failures, into: profiles)
             persist()
-            requestCLISettings()
+            if requestCLISettingsOnFailure {
+                requestCLISettings()
+            }
             return
         }
         isRefreshing = true
         defer { isRefreshing = false }
-        let requestedProfiles = profiles
         var refreshedProfiles: [UUID: AccountProfile] = [:]
         for profile in requestedProfiles {
             refreshedProfiles[profile.id] = await refreshedProfile(
