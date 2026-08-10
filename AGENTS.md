@@ -1,14 +1,8 @@
 # CodexSwitch agent guidance
 
-This repository is a small native macOS menu-bar app. Product behavior belongs
-in `docs/specs/`; this file defines the working rules.
-
-## Mandatory Spec Gate
-
-Before changing product behavior, read `docs/specs/README.md`,
-`docs/specs/index.md`, and the selected active spec. State a compact Spec
-Basis (contract, invariants, gaps, and implementation authority) before
-opening implementation sources. Update the spec before its implementation.
+This repository is a small native macOS menu-bar app. Start project
+specification discovery at `docs/specs/index.md`; this file defines local
+working rules.
 
 ## Repository rules
 
@@ -18,8 +12,8 @@ opening implementation sources. Update the spec before its implementation.
   commit and appropriate verification.
 - Read `SWIFT.md` before changing Swift, AppKit, SwiftUI, tests, or Xcode
   project configuration.
-- Keep external calls bounded. Never log credentials, OAuth tokens, or raw
-  account payloads. Do not scrape ChatGPT/Codex web pages.
+- Never log credentials, OAuth tokens, or raw account payloads. Do not scrape
+  ChatGPT/Codex web pages.
 - The app may use the documented local `codex app-server` JSON-RPC boundary;
   it must not read or mutate another Codex installation's credential files.
 
