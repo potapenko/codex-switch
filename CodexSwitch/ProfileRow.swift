@@ -15,14 +15,19 @@ struct ProfileRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            HStack {
+            HStack(spacing: 10) {
                 profileName
                     .lineLimit(1)
                     .truncationMode(.middle)
-                    .layoutPriority(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .help(displayName)
-                Spacer()
-                if let plan = profile.snapshot?.plan { Text(plan).foregroundStyle(.secondary) }
+                if let plan = profile.snapshot?.plan {
+                    Text(plan)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                        .layoutPriority(1)
+                }
                 retryActionSlot
                 Button("Remove", role: .destructive, action: remove)
                     .buttonStyle(.borderless)
