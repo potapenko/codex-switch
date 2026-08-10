@@ -582,3 +582,27 @@ switch action.
   acceptance residual recorded for revisions 3–6 remains explicit; supporting
   fresh-build Accessibility sampling and screen captures are recorded in their
   respective Contract Deltas.
+
+## Release Contract Baseline: v1.0.6
+
+- **Release:** `v1.0.6`, build `13`, published 2026-08-10.
+- **Implementation revision:** `02628c849bf020c7f803aacc815b099d473e85fc`.
+- **Specification revisions:** `codex-account-status` revision 7 and the
+  active direct-distribution contract.
+- **Included domains:** the six-hour managed account refresh lifecycle,
+  launch/wake due checks, non-overlapping scheduled and explicit refreshes,
+  and the one-line middle-truncated profile heading correction, plus all
+  behavior released through `v1.0.5`.
+- **QA and runtime evidence:** 18 macOS tests passed locally and on GitHub
+  Actions; workflow run `31387409910` built, signed, notarized, stapled, and
+  published the app and DMG. A local build-13 packaging preview passed before
+  tagging. Independent download verification passed the four-asset inventory,
+  public manifest, checksums, `codesign`, stapler, Gatekeeper, and DMG-layout
+  checks.
+- **Compatibility and migration:** backward-compatible with existing profile
+  metadata, cached snapshots, isolated `CODEX_HOME` directories, and Codex CLI
+  configuration; no migration is required.
+- **Known exclusions and residuals:** scheduled work runs only while
+  CodexSwitch is active and cannot repair a profile that already requires
+  interactive browser sign-in. Desktop Codex account switching remains out of
+  scope.
