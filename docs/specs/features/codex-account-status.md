@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 9
+- **Contract revision:** 10
 - **Authority:** Active
-- **Stability:** Released through v1.0.7; per-account manual refresh evolving
+- **Stability:** Released through v1.0.7; per-account refresh indication evolving
 
 ## Goal
 
@@ -78,11 +78,14 @@ separately authenticated ChatGPT accounts.
   one native indeterminate progress indicator. The slot remains part of the
   layout while idle and only the indicator's visibility changes. While any
   quota refresh is active, that single indicator communicates loading and
-  **Refresh all** keeps its normal position and size in a disabled state. A
-  refresh initiated from an account's own refresh control additionally
-  replaces only that account's refresh symbol with a native indeterminate
-  indicator in the same fixed slot. No other row shows progress, and the list
-  shows no skeleton, shimmer, or **Refreshing…** text.
+  **Refresh all** keeps its normal position and size in a disabled state.
+  Whenever the refresh engine is actively processing one account, that
+  account's refresh symbol is additionally replaced by a native indeterminate
+  indicator in the same fixed slot. This applies regardless of whether the
+  operation was manual, **Refresh all**, on-open, due, or scheduled. A
+  sequential batch moves the indicator to the next account as its request
+  begins. No other row shows progress, and the list shows no skeleton, shimmer,
+  or **Refreshing…** text.
 - A normal quota refresh preserves every row's last terminal presentation for
   the duration of the request: quota metadata, recovery callouts, errors, and
   action slots do not disappear or change position as individual profiles are
@@ -169,9 +172,10 @@ separately authenticated ChatGPT accounts.
   side effect. For sign-in-required or signing-in profiles the control remains
   visible but disabled because recovery requires the existing interactive
   browser action. While any refresh is active, all row refresh controls are
-  disabled; only a request initiated from a row replaces that row's symbol
-  with an indeterminate indicator. The fixed slot prevents refresh state from
-  moving quota metadata or the removal button.
+  disabled; the account currently being processed replaces its symbol with an
+  indeterminate indicator regardless of which refresh entry point started the
+  operation. The fixed slot prevents refresh state from moving quota metadata
+  or the removal button.
 - Every normal profile refresh asks the managed ChatGPT app-server to refresh
   its token before reading quotas. Codex owns that refresh lifecycle; the app
   never reads, stores, or refreshes OAuth tokens itself.
@@ -260,9 +264,9 @@ separately authenticated ChatGPT accounts.
   retained, **signing in** while a browser login is pending, **sign-in
   required** when no usable authentication exists, or **failed** when a
   refresh without a snapshot fails. Normal quota loading is represented by the
-  fixed header progress indicator and, for a manually refreshed account, the
-  temporary indicator in that account's fixed refresh-control slot. It does
-  not replace an individual row's terminal presentation. The persisted
+  fixed header progress indicator and the temporary indicator in the fixed
+  refresh-control slot of the account currently being processed. It does not
+  replace an individual row's terminal presentation. The persisted
   `refreshing` value remains a backward-compatible transient model value and
   restores to cached or sign-in-required on relaunch, but is not a row-level
   presentation. A fresh snapshot
@@ -317,14 +321,15 @@ separately authenticated ChatGPT accounts.
 - `xcodebuild ... test` covers the build/test gate.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.
 - Computer Use acceptance observes the dedicated callout, its prominent action,
-  the fixed global loading indicator, one manually refreshed row replacing its
-  refresh symbol with local progress, stable coordinates while transient
-  loading leaves row geometry unchanged, measured growth and shrinkage when
-  visible content genuinely changes, no blank list space after the final row,
-  screen-bounded growth for five and larger profile sets, scrolling only after
-  the current display budget is exhausted, and the pending browser-sign-in
-  presentation in the freshly built popover; light and dark appearances retain
-  readable contrast and hierarchy.
+  the fixed global loading indicator, **Refresh all** moving local progress
+  through exactly the account being processed, a manual refresh using that
+  same fixed slot, stable coordinates while transient loading leaves row
+  geometry unchanged, measured growth and shrinkage when visible content
+  genuinely changes, no blank list space after the final row, screen-bounded
+  growth for five and larger profile sets, scrolling only after the current
+  display budget is exhausted, and the pending browser-sign-in presentation in
+  the freshly built popover; light and dark appearances retain readable
+  contrast and hierarchy.
 
 ## Contract Delta: per-account-refresh-1
 
@@ -339,3 +344,17 @@ separately authenticated ChatGPT accounts.
 - **Compatibility:** no stored schema, account-server protocol, authentication,
   scheduling, global refresh, quota, ordering, or removal behavior changes.
 - **New contract revision:** `codex-account-status` revision 9.
+
+## Contract Delta: active-account-refresh-indicator-1
+
+- **Change mode:** Evolve.
+- **Authorized by:** owner clarification on 2026-08-13.
+- **Previous behavior:** local progress was limited to a request initiated by
+  that account's own refresh button.
+- **New behavior:** local progress identifies the account currently being
+  processed for every normal quota-refresh entry point, while the manual
+  refresh button remains available when idle.
+- **Compatibility:** sequential order, no-overlap, atomic batch publication,
+  scheduler policy, authentication, quota results, persistence, and removal
+  behavior remain unchanged.
+- **New contract revision:** `codex-account-status` revision 10.

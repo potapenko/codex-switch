@@ -1,10 +1,10 @@
 # Account card
 
-- **Contract revision:** 2
+- **Contract revision:** 3
 - **Authority:** Active
-- **Stability:** Released through v1.0.7; per-account manual refresh evolving
+- **Stability:** Released through v1.0.7; per-account refresh indication evolving
 - **Precedence:** This contract governs account-card presentation and removal
-  confirmation. `codex-account-status` revision 8 continues to govern account
+  confirmation. `codex-account-status` revision 10 continues to govern account
   data, state, ordering, refresh, authentication, persistence, and popover
   geometry.
 
@@ -65,10 +65,13 @@ product requirements.
 - Activating the control refreshes only that account through the existing
   managed-token and quota request path. It has no account-switching,
   authentication-profile, reset-credit, ordering, or removal side effect.
-- While that manual request is active, the refresh symbol is replaced by one
-  native indeterminate progress indicator in the same fixed slot. Other rows
-  do not show progress. The row keeps its complete terminal presentation until
-  the request publishes one terminal result.
+- While any normal quota request is actively processing that account, the
+  refresh symbol is replaced by one native indeterminate progress indicator in
+  the same fixed slot. This applies to manual, **Refresh all**, on-open, due,
+  and scheduled refreshes. Only the account currently being processed shows
+  progress; in a sequential batch the indicator moves to the next account when
+  its request begins. Every row keeps its complete terminal presentation until
+  the operation publishes its terminal result.
 - The control is disabled while any refresh is active and for sign-in-required
   or signing-in accounts, which continue to use the existing interactive
   recovery action. The trash button remains available while refresh work is
@@ -99,10 +102,11 @@ product requirements.
 - The full macOS test suite and `git diff --check` remain the source gate.
 - `script/build_and_run.sh --verify` proves a fresh bundle launches.
 - Computer Use acceptance opens the fresh popover, inspects representative
-  cards, activates one account's refresh control, observes progress only in
-  that fixed slot without card movement, then activates a trash icon, observes
-  the native alert and its exact actions/message, chooses **Cancel**, and
-  verifies that the card remains.
+  cards, activates **Refresh all**, observes progress move through the accounts
+  one fixed slot at a time without card movement, verifies the same slot for a
+  manual account refresh, then activates a trash icon, observes the native
+  alert and its exact actions/message, chooses **Cancel**, and verifies that
+  the card remains.
   Destructive confirmation is exercised only against a disposable profile;
   real owner accounts are never removed for QA.
 - Before/reference/after component screenshots and a full-popover capture are
@@ -148,3 +152,23 @@ product requirements.
 - **Specification paths changed:** this contract and
   `docs/specs/features/codex-account-status.md`.
 - **New contract revision:** `account-card` revision 2.
+
+## Contract Delta: active-account-refresh-indicator-1
+
+- **Change mode:** Evolve.
+- **Authorized by:** owner clarification on 2026-08-13.
+- **Previous behavior:** the local progress indicator appeared only when the
+  account's own refresh button initiated the request.
+- **New behavior:** the fixed refresh slot shows progress whenever that account
+  is the request currently being processed, including sequential **Refresh
+  all**, on-open, due, and scheduled operations; the manual button remains.
+- **Compatibility:** progress provenance is broadened without changing request
+  order, concurrency, result publication, account state, persistence, or any
+  refresh effect.
+- **Adjacent domains checked:** global refresh indication, atomic batch
+  publication, scheduler eligibility, authentication recovery, removal,
+  profile order, share view, popover geometry, and quota semantics are
+  protected.
+- **Specification paths changed:** this contract and
+  `docs/specs/features/codex-account-status.md`.
+- **New contract revision:** `account-card` revision 3.

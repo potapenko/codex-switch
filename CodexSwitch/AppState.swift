@@ -79,9 +79,13 @@ final class AppState {
             return
         }
         isRefreshing = true
-        defer { isRefreshing = false }
+        defer {
+            isRefreshing = false
+            refreshingProfileID = nil
+        }
         var refreshedProfiles: [UUID: AccountProfile] = [:]
         for profile in requestedProfiles {
+            refreshingProfileID = profile.id
             refreshedProfiles[profile.id] = await refreshedProfile(
                 from: profile,
                 executable: executable
