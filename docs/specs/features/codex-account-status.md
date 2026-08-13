@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 8
+- **Contract revision:** 9
 - **Authority:** Active
-- **Stability:** Released through v1.0.7
+- **Stability:** Released through v1.0.7; per-account manual refresh evolving
 
 ## Goal
 
@@ -78,8 +78,11 @@ separately authenticated ChatGPT accounts.
   one native indeterminate progress indicator. The slot remains part of the
   layout while idle and only the indicator's visibility changes. While any
   quota refresh is active, that single indicator communicates loading and
-  **Refresh all** keeps its normal position and size in a disabled state. The
-  list shows no per-row spinner, skeleton, shimmer, or **Refreshing…** text.
+  **Refresh all** keeps its normal position and size in a disabled state. A
+  refresh initiated from an account's own refresh control additionally
+  replaces only that account's refresh symbol with a native indeterminate
+  indicator in the same fixed slot. No other row shows progress, and the list
+  shows no skeleton, shimmer, or **Refreshing…** text.
 - A normal quota refresh preserves every row's last terminal presentation for
   the duration of the request: quota metadata, recovery callouts, errors, and
   action slots do not disappear or change position as individual profiles are
@@ -160,11 +163,15 @@ separately authenticated ChatGPT accounts.
   returned email when available.
 - **Refresh all** reads each stored profile independently. A failure leaves the
   last successful snapshot visible and gives that profile a short status.
-- A failed or cached profile exposes a per-row **Retry** action. It refreshes
-  only that profile and never removes its last good snapshot. A retry has no
-  account-switching side effect. The action occupies a fixed trailing action
-  slot in the profile heading instead of adding a conditional vertical row, so
-  enabling, disabling, or clearing it does not move quota metadata below it.
+- Every profile heading exposes a fixed refresh-symbol control immediately
+  before removal. For fresh, cached, or failed profiles it refreshes only that
+  profile and never removes its last good snapshot. It has no account-switching
+  side effect. For sign-in-required or signing-in profiles the control remains
+  visible but disabled because recovery requires the existing interactive
+  browser action. While any refresh is active, all row refresh controls are
+  disabled; only a request initiated from a row replaces that row's symbol
+  with an indeterminate indicator. The fixed slot prevents refresh state from
+  moving quota metadata or the removal button.
 - Every normal profile refresh asks the managed ChatGPT app-server to refresh
   its token before reading quotas. Codex owns that refresh lifecycle; the app
   never reads, stores, or refreshes OAuth tokens itself.
@@ -183,8 +190,9 @@ separately authenticated ChatGPT accounts.
   launch due check.
 - When managed credentials can no longer be refreshed, the row retains its
   last successful snapshot and enters **sign-in required**. It presents a
-  per-row **Sign in again** action instead of **Retry**. The status is a compact
-  recovery instruction, not a raw server error.
+  per-row **Sign in again** action while its manual refresh control remains
+  disabled. The status is a compact recovery instruction, not a raw server
+  error.
 - **Sign-in required** is presented as a dedicated SwiftUI recovery callout
   inside the affected row, visually separate from quota metadata and ordinary
   refresh failures. The callout combines a semantic authentication-warning
@@ -251,9 +259,10 @@ separately authenticated ChatGPT accounts.
   **fresh** after a successful refresh, **cached** when an earlier snapshot is
   retained, **signing in** while a browser login is pending, **sign-in
   required** when no usable authentication exists, or **failed** when a
-  refresh without a snapshot fails. Normal quota loading is a dashboard-level
-  activity represented by the fixed header progress indicator; it does not
-  replace an individual row's terminal presentation. The persisted
+  refresh without a snapshot fails. Normal quota loading is represented by the
+  fixed header progress indicator and, for a manually refreshed account, the
+  temporary indicator in that account's fixed refresh-control slot. It does
+  not replace an individual row's terminal presentation. The persisted
   `refreshing` value remains a backward-compatible transient model value and
   restores to cached or sign-in-required on relaunch, but is not a row-level
   presentation. A fresh snapshot
@@ -302,16 +311,31 @@ separately authenticated ChatGPT accounts.
 ## Verification mapping
 
 - Unit tests cover profile persistence, returned-quota decoding, and the
-  retry/sign-in action mapping for every recovery state. Focused policy tests
+  refresh/sign-in action mapping for every recovery state. Focused policy tests
   cover the six-hour boundary, launch/wake staleness selection, and exclusion
   of interactive recovery states from periodic refresh.
 - `xcodebuild ... test` covers the build/test gate.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.
 - Computer Use acceptance observes the dedicated callout, its prominent action,
-  the fixed global loading indicator, stable coordinates while transient
+  the fixed global loading indicator, one manually refreshed row replacing its
+  refresh symbol with local progress, stable coordinates while transient
   loading leaves row geometry unchanged, measured growth and shrinkage when
   visible content genuinely changes, no blank list space after the final row,
   screen-bounded growth for five and larger profile sets, scrolling only after
   the current display budget is exhausted, and the pending browser-sign-in
   presentation in the freshly built popover; light and dark appearances retain
   readable contrast and hierarchy.
+
+## Contract Delta: per-account-refresh-1
+
+- **Change mode:** Evolve.
+- **Authorized by:** owner request and approved implementation plan on
+  2026-08-13.
+- **Previous behavior:** only cached and failed profiles exposed a conditional
+  text **Retry** action, and active quota loading had only a global indicator.
+- **New behavior:** every profile has a fixed refresh-symbol control; eligible
+  profiles can refresh independently, and the initiating row alone shows local
+  progress in that control's slot while retaining its terminal content.
+- **Compatibility:** no stored schema, account-server protocol, authentication,
+  scheduling, global refresh, quota, ordering, or removal behavior changes.
+- **New contract revision:** `codex-account-status` revision 9.

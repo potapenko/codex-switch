@@ -113,17 +113,18 @@ final class QuotaResponseDecoderTests: XCTestCase {
         XCTAssertEqual(profile.maskedDisplayName(fallback: "Account 1"), "Account 1")
     }
 
-    func testRecoveryStatesExposeExactlyOneAppropriateAction() {
-        XCTAssertFalse(AccountProfile(snapshotState: .fresh).supportsRetry)
-        XCTAssertTrue(AccountProfile(snapshotState: .cached).supportsRetry)
-        XCTAssertTrue(AccountProfile(snapshotState: .failed).supportsRetry)
-        XCTAssertFalse(AccountProfile(snapshotState: .signInRequired).supportsRetry)
+    func testProfileStatesExposeAppropriateRefreshAndSignInActions() {
+        XCTAssertTrue(AccountProfile(snapshotState: .fresh).supportsRefresh)
+        XCTAssertTrue(AccountProfile(snapshotState: .cached).supportsRefresh)
+        XCTAssertTrue(AccountProfile(snapshotState: .failed).supportsRefresh)
+        XCTAssertFalse(AccountProfile(snapshotState: .refreshing).supportsRefresh)
+        XCTAssertFalse(AccountProfile(snapshotState: .signInRequired).supportsRefresh)
+        XCTAssertFalse(AccountProfile(snapshotState: .signingIn).supportsRefresh)
 
         XCTAssertFalse(AccountProfile(snapshotState: .fresh).supportsSignIn)
         XCTAssertFalse(AccountProfile(snapshotState: .cached).supportsSignIn)
         XCTAssertTrue(AccountProfile(snapshotState: .signInRequired).supportsSignIn)
         XCTAssertFalse(AccountProfile(snapshotState: .signingIn).supportsSignIn)
-        XCTAssertFalse(AccountProfile(snapshotState: .signingIn).supportsRetry)
     }
 
     func testProfileOrderingMovesASelectionUsingNativeListOffsets() {

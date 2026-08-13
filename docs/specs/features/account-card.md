@@ -1,8 +1,8 @@
 # Account card
 
-- **Contract revision:** 1
+- **Contract revision:** 2
 - **Authority:** Active
-- **Stability:** Released through v1.0.7
+- **Stability:** Released through v1.0.7; per-account manual refresh evolving
 - **Precedence:** This contract governs account-card presentation and removal
   confirmation. `codex-account-status` revision 8 continues to govern account
   data, state, ordering, refresh, authentication, persistence, and popover
@@ -21,8 +21,8 @@ single click, without changing any account, quota, refresh, or list behavior.
   uses native SwiftUI material and a restrained semantic stroke; it must remain
   legible in light and dark appearances and must not hardcode a white theme.
 - The heading keeps the account label on one middle-truncated line, followed
-  by a quiet plan capsule when a plan exists, the existing fixed retry slot,
-  and a trailing trash-symbol button.
+  by a quiet plan capsule when a plan exists, a fixed manual-refresh slot, and
+  a trailing trash-symbol button.
 - When a snapshot exists, the first divided section pairs the existing
   text-bearing remaining-percentage badge with its reset date and time. The
   badge may add a small determinate ring for faster scanning, but the percentage
@@ -57,11 +57,29 @@ product requirements.
   boundary remains unchanged: no `CODEX_HOME`, credential, OAuth, or other
   Codex authentication data is read, changed, or deleted.
 
+### ACARD-REFRESH-1 — per-account refresh
+
+- Every account heading reserves one quiet native refresh control immediately
+  before the trash button. The control is present for every terminal state so
+  account headings keep stable geometry.
+- Activating the control refreshes only that account through the existing
+  managed-token and quota request path. It has no account-switching,
+  authentication-profile, reset-credit, ordering, or removal side effect.
+- While that manual request is active, the refresh symbol is replaced by one
+  native indeterminate progress indicator in the same fixed slot. Other rows
+  do not show progress. The row keeps its complete terminal presentation until
+  the request publishes one terminal result.
+- The control is disabled while any refresh is active and for sign-in-required
+  or signing-in accounts, which continue to use the existing interactive
+  recovery action. The trash button remains available while refresh work is
+  active.
+
 ### ACARD-ACCESSIBILITY-1 — redundant meaning
 
-- The trash icon exposes a text accessibility label and hint; the quota ring is
-  decorative for accessibility because the full remaining and used values stay
-  in the existing quota label.
+- The refresh and trash icons expose account-specific text accessibility
+  labels and hints. The local progress indicator names the account being
+  refreshed. The quota ring is decorative for accessibility because the full
+  remaining and used values stay in the existing quota label.
 - Status meaning never relies on colour or iconography alone. Keyboard focus,
   Escape cancellation, pointer help, share-view naming, and full account-label
   accessibility remain available.
@@ -69,7 +87,8 @@ product requirements.
 ## Protected behavior
 
 - Account and quota values, reset-credit semantics, state transitions,
-  authentication, refresh scheduling/publication, retry and sign-in behavior.
+  authentication, global and scheduled refresh publication, and sign-in
+  behavior.
 - Native row reordering, saved order, share-view editing, measured list and
   popover geometry, header, footer, settings, menu-bar identity, and
   distribution behavior.
@@ -80,8 +99,10 @@ product requirements.
 - The full macOS test suite and `git diff --check` remain the source gate.
 - `script/build_and_run.sh --verify` proves a fresh bundle launches.
 - Computer Use acceptance opens the fresh popover, inspects representative
-  cards, activates a trash icon, observes the native alert and its exact
-  actions/message, chooses **Cancel**, and verifies that the card remains.
+  cards, activates one account's refresh control, observes progress only in
+  that fixed slot without card movement, then activates a trash icon, observes
+  the native alert and its exact actions/message, chooses **Cancel**, and
+  verifies that the card remains.
   Destructive confirmation is exercised only against a disposable profile;
   real owner accounts are never removed for QA.
 - Before/reference/after component screenshots and a full-popover capture are
@@ -104,3 +125,26 @@ product requirements.
   protected.
 - **Specification paths changed:** this contract and `docs/specs/index.md`.
 - **New contract revision:** `account-card` revision 1.
+
+## Contract Delta: per-account-refresh-1
+
+- **Change mode:** Evolve.
+- **Authorized by:** owner request and approved implementation plan on
+  2026-08-13.
+- **Previous behavior:** failed or cached accounts conditionally exposed a
+  text **Retry** action; active quota loading was represented only by the
+  dashboard-level indicator.
+- **New behavior:** every account reserves a refresh-symbol control before the
+  trash button; a manual refresh updates only that account and replaces its
+  symbol with a local indeterminate indicator until one terminal result is
+  published.
+- **Compatibility:** scoped refresh-control and activity-presentation
+  evolution only; account data, persistence, authentication, removal, global
+  refresh, scheduling, and ordering contracts remain unchanged.
+- **Adjacent domains checked:** popover/list geometry, global refresh
+  publication, background scheduling, authentication recovery, removal,
+  profile order, share view, quota semantics, settings, and distribution are
+  protected.
+- **Specification paths changed:** this contract and
+  `docs/specs/features/codex-account-status.md`.
+- **New contract revision:** `account-card` revision 2.

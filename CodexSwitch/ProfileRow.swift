@@ -5,8 +5,9 @@ struct ProfileRow: View {
     let displayName: String
     let areEmailsMasked: Bool
     let isRefreshing: Bool
+    let isRefreshingThisProfile: Bool
     let remove: () -> Void
-    let retry: () -> Void
+    let refresh: () -> Void
     let signIn: () -> Void
     let saveNickname: (String) -> Void
     @State private var isEditingNickname = false
@@ -60,8 +61,8 @@ struct ProfileRow: View {
         .accessibilityActions {
             if canSignIn {
                 Button("Sign in again", action: signIn)
-            } else if canRetry {
-                Button("Retry", action: retry)
+            } else if canRefresh {
+                Button("Refresh account", action: refresh)
             }
         }
     }
@@ -77,7 +78,7 @@ struct ProfileRow: View {
                 AccountPlanBadge(title: plan)
                     .layoutPriority(1)
             }
-            retryActionSlot
+            refreshActionSlot
             Button {
                 isRemovalConfirmationPresented = true
             } label: {
@@ -170,12 +171,8 @@ struct ProfileRow: View {
         }
     }
 
-    private var canRetry: Bool {
-        !isRefreshing && profile.supportsRetry
-    }
-
-    private var showsRetry: Bool {
-        profile.supportsRetry
+    private var canRefresh: Bool {
+        !isRefreshing && profile.supportsRefresh
     }
 
     private var canSignIn: Bool {
@@ -221,14 +218,29 @@ struct ProfileRow: View {
         }
     }
 
-    private var retryActionSlot: some View {
-        Button("Retry", action: retry)
-            .buttonStyle(.borderless)
-            .disabled(!canRetry)
-            .opacity(showsRetry ? 1 : 0)
-            .allowsHitTesting(showsRetry)
-            .accessibilityHidden(!showsRetry)
-            .frame(width: 36, alignment: .trailing)
+    private var refreshActionSlot: some View {
+        ZStack {
+            if isRefreshingThisProfile {
+                ProgressView()
+                    .controlSize(.small)
+                    .help("Refreshing \(displayName)")
+                    .accessibilityLabel("Refreshing account: \(displayName)")
+            } else {
+                Button(action: refresh) {
+                    Image(systemName: "arrow.clockwise")
+                        .foregroundStyle(.secondary)
+                        .frame(width: 18, height: 18)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.borderless)
+                .disabled(!canRefresh)
+                .frame(width: 24, height: 24)
+                .help("Refresh account")
+                .accessibilityLabel("Refresh account: \(displayName)")
+                .accessibilityHint("Refreshes quota data for this account only")
+            }
+        }
+        .frame(width: 24, height: 24)
     }
 
     private func quotaLine(primary: QuotaWindow, usedPercent: Double) -> some View {

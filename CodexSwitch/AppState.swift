@@ -8,6 +8,7 @@ final class AppState {
     private let codexCLIPathStore = CodexCLIPathStore()
     private(set) var profiles: [AccountProfile]
     private(set) var isRefreshing = false
+    private(set) var refreshingProfileID: UUID?
     private(set) var isPopoverPresented = false
     private(set) var codexCLIPath: String?
     private(set) var isCLISettingsRequested = false
@@ -143,10 +144,16 @@ final class AppState {
         persist()
     }
 
-    func retry(profileID: UUID) async {
-        guard !isRefreshing, let profile = profiles.first(where: { $0.id == profileID }) else { return }
+    func refreshProfile(profileID: UUID) async {
+        guard !isRefreshing,
+              let profile = profiles.first(where: { $0.id == profileID }),
+              profile.supportsRefresh else { return }
         isRefreshing = true
-        defer { isRefreshing = false }
+        refreshingProfileID = profileID
+        defer {
+            isRefreshing = false
+            refreshingProfileID = nil
+        }
         do {
             let executable = try configuredCodexCLI()
             let result = await refreshedProfile(from: profile, executable: executable)

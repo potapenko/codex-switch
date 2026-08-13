@@ -112,11 +112,12 @@ struct MenuBarView: View {
                                 : profile.label,
                             areEmailsMasked: areEmailsMasked,
                             isRefreshing: appState.isRefreshing,
+                            isRefreshingThisProfile: appState.refreshingProfileID == profile.id,
                             remove: {
                                 appState.removeAccount(profileID: profile.id)
                             },
-                            retry: {
-                                Task { await appState.retry(profileID: profile.id) }
+                            refresh: {
+                                Task { await appState.refreshProfile(profileID: profile.id) }
                             },
                             signIn: {
                                 Task { await appState.signInAgain(profileID: profile.id) }

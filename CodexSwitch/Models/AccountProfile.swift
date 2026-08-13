@@ -53,8 +53,13 @@ struct AccountProfile: Codable, Hashable, Identifiable {
         nickname ?? fallback
     }
 
-    var supportsRetry: Bool {
-        snapshotState == .cached || snapshotState == .failed
+    var supportsRefresh: Bool {
+        switch snapshotState {
+        case .fresh, .cached, .failed:
+            true
+        case .refreshing, .signingIn, .signInRequired:
+            false
+        }
     }
 
     var supportsSignIn: Bool {
