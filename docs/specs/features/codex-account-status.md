@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 10
+- **Contract revision:** 11
 - **Authority:** Active
-- **Stability:** Released through v1.0.7; per-account refresh indication evolving
+- **Stability:** Released through v1.0.7; per-account refresh feedback evolving
 
 ## Goal
 
@@ -72,8 +72,8 @@ separately authenticated ChatGPT accounts.
   profile-count checks or state-specific height estimates. A normal quota
   refresh still preserves each row's terminal presentation while work is in
   flight, so transient loading alone does not move the header, rows, or footer;
-  an atomically published terminal result may resize the popover when it
-  genuinely changes rendered row geometry.
+  a completed account's atomically published terminal result may resize the
+  popover when it genuinely changes rendered row geometry.
 - The header reserves a fixed-size slot immediately before **Refresh all** for
   one native indeterminate progress indicator. The slot remains part of the
   layout while idle and only the indicator's visibility changes. While any
@@ -86,14 +86,13 @@ separately authenticated ChatGPT accounts.
   sequential batch moves the indicator to the next account as its request
   begins. No other row shows progress, and the list shows no skeleton, shimmer,
   or **Refreshing…** text.
-- A normal quota refresh preserves every row's last terminal presentation for
-  the duration of the request: quota metadata, recovery callouts, errors, and
-  action slots do not disappear or change position as individual profiles are
-  processed. **Refresh all** applies its collected terminal results to the
-  profile list in one observable update after all requested profiles finish,
-  rather than exposing sequential intermediate row states. Changed terminal
-  values may update once at completion, but transient loading state must never
-  repeatedly remove and restore row content.
+- A normal quota refresh preserves an account's last terminal presentation
+  while that account's request is in flight: quota metadata, recovery callouts,
+  errors, and action slots do not disappear or change position. When the
+  request finishes, that account immediately publishes its complete terminal
+  result, including its new **Updated** value, before a sequential operation
+  starts processing the next account. Transient loading state never removes
+  and restores row content; only completed terminal results change the row.
 - The bottom action bar contains **Add account** and **Quit**. **Quit**
   terminates CodexSwitch only; it does not start, stop, switch, or otherwise
   change any Codex account or desktop session.
@@ -322,14 +321,15 @@ separately authenticated ChatGPT accounts.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.
 - Computer Use acceptance observes the dedicated callout, its prominent action,
   the fixed global loading indicator, **Refresh all** moving local progress
-  through exactly the account being processed, a manual refresh using that
-  same fixed slot, stable coordinates while transient loading leaves row
-  geometry unchanged, measured growth and shrinkage when visible content
-  genuinely changes, no blank list space after the final row, screen-bounded
-  growth for five and larger profile sets, scrolling only after the current
-  display budget is exhausted, and the pending browser-sign-in presentation in
-  the freshly built popover; light and dark appearances retain readable
-  contrast and hierarchy.
+  through exactly the account being processed, each completed account showing
+  its terminal values and **Updated just now** before progress moves to the
+  next account, a manual refresh using that same fixed slot, stable coordinates
+  while transient loading leaves row geometry unchanged, measured growth and
+  shrinkage when completed content genuinely changes, no blank list space
+  after the final row, screen-bounded growth for five and larger profile sets,
+  scrolling only after the current display budget is exhausted, and the
+  pending browser-sign-in presentation in the freshly built popover; light and
+  dark appearances retain readable contrast and hierarchy.
 
 ## Contract Delta: per-account-refresh-1
 
@@ -358,3 +358,18 @@ separately authenticated ChatGPT accounts.
   scheduler policy, authentication, quota results, persistence, and removal
   behavior remain unchanged.
 - **New contract revision:** `codex-account-status` revision 10.
+
+## Contract Delta: incremental-account-refresh-publication-1
+
+- **Change mode:** Evolve.
+- **Authorized by:** owner clarification and implementation approval on
+  2026-08-13.
+- **Previous behavior:** sequential refresh operations published collected
+  terminal results only after every requested account completed.
+- **New behavior:** each account publishes and persists its complete terminal
+  result immediately after its own request completes, before the next account
+  begins; **Updated** therefore reflects completion row by row.
+- **Compatibility:** request order, no-overlap, managed-token flow, scheduler
+  policy, authentication, quota semantics, removal safety, profile order, and
+  local nicknames remain unchanged.
+- **New contract revision:** `codex-account-status` revision 11.

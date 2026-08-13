@@ -83,16 +83,18 @@ final class AppState {
             isRefreshing = false
             refreshingProfileID = nil
         }
-        var refreshedProfiles: [UUID: AccountProfile] = [:]
         for profile in requestedProfiles {
             refreshingProfileID = profile.id
-            refreshedProfiles[profile.id] = await refreshedProfile(
+            let result = await refreshedProfile(
                 from: profile,
                 executable: executable
             )
+            profiles = ProfileRefreshBatch.merging(
+                [profile.id: result],
+                into: profiles
+            )
+            persist()
         }
-        profiles = ProfileRefreshBatch.merging(refreshedProfiles, into: profiles)
-        persist()
     }
 
     func configureCodexCLI(path: String) async throws {

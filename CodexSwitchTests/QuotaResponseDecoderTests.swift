@@ -195,7 +195,7 @@ final class QuotaResponseDecoderTests: XCTestCase {
         )
     }
 
-    func testRefreshBatchPublishesTerminalProfilesWithoutRestoringRemovedRows() {
+    func testRefreshResultsPublishIncrementallyWithoutRestoringRemovedRows() {
         let first = AccountProfile(label: "First", nickname: "Pinned name", snapshotState: .cached)
         let second = AccountProfile(label: "Second", snapshotState: .cached)
         let addedDuringRefresh = AccountProfile(label: "Added during refresh")
@@ -210,21 +210,31 @@ final class QuotaResponseDecoderTests: XCTestCase {
         var refreshedRemoved = removedBeforeCompletion
         refreshedRemoved.snapshotState = .fresh
 
-        let published = ProfileRefreshBatch.merging(
-            [
-                first.id: refreshedFirst,
-                second.id: refreshedSecond,
-                removedBeforeCompletion.id: refreshedRemoved
-            ],
+        let firstPublished = ProfileRefreshBatch.merging(
+            [first.id: refreshedFirst],
             into: [second, first, addedDuringRefresh]
         )
 
-        XCTAssertEqual(published.map(\.id), [second.id, first.id, addedDuringRefresh.id])
-        XCTAssertEqual(published[0].snapshotState, .signInRequired)
-        XCTAssertEqual(published[1].label, "First updated")
-        XCTAssertEqual(published[1].snapshotState, .fresh)
-        XCTAssertEqual(published[1].nickname, "Pinned name")
-        XCTAssertEqual(published[2], addedDuringRefresh)
+        XCTAssertEqual(firstPublished.map(\.id), [second.id, first.id, addedDuringRefresh.id])
+        XCTAssertEqual(firstPublished[0].snapshotState, .cached)
+        XCTAssertEqual(firstPublished[1].label, "First updated")
+        XCTAssertEqual(firstPublished[1].snapshotState, .fresh)
+        XCTAssertEqual(firstPublished[1].nickname, "Pinned name")
+
+        let secondPublished = ProfileRefreshBatch.merging(
+            [
+                second.id: refreshedSecond,
+                removedBeforeCompletion.id: refreshedRemoved
+            ],
+            into: firstPublished
+        )
+
+        XCTAssertEqual(secondPublished.map(\.id), [second.id, first.id, addedDuringRefresh.id])
+        XCTAssertEqual(secondPublished[0].snapshotState, .signInRequired)
+        XCTAssertEqual(secondPublished[1].label, "First updated")
+        XCTAssertEqual(secondPublished[1].snapshotState, .fresh)
+        XCTAssertEqual(secondPublished[1].nickname, "Pinned name")
+        XCTAssertEqual(secondPublished[2], addedDuringRefresh)
     }
 
     func testBackgroundRefreshPolicyUsesSixHourBoundaryAndSkipsInteractiveRecovery() {

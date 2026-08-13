@@ -1,10 +1,10 @@
 # Account card
 
-- **Contract revision:** 3
+- **Contract revision:** 4
 - **Authority:** Active
-- **Stability:** Released through v1.0.7; per-account refresh indication evolving
+- **Stability:** Released through v1.0.7; per-account refresh feedback evolving
 - **Precedence:** This contract governs account-card presentation and removal
-  confirmation. `codex-account-status` revision 10 continues to govern account
+  confirmation. `codex-account-status` revision 11 continues to govern account
   data, state, ordering, refresh, authentication, persistence, and popover
   geometry.
 
@@ -70,8 +70,9 @@ product requirements.
   the same fixed slot. This applies to manual, **Refresh all**, on-open, due,
   and scheduled refreshes. Only the account currently being processed shows
   progress; in a sequential batch the indicator moves to the next account when
-  its request begins. Every row keeps its complete terminal presentation until
-  the operation publishes its terminal result.
+  its request begins. A row keeps its previous complete terminal presentation
+  while its own request is in flight, then publishes its new complete terminal
+  result, including **Updated**, before progress moves to the next account.
 - The control is disabled while any refresh is active and for sign-in-required
   or signing-in accounts, which continue to use the existing interactive
   recovery action. The trash button remains available while refresh work is
@@ -89,9 +90,8 @@ product requirements.
 
 ## Protected behavior
 
-- Account and quota values, reset-credit semantics, state transitions,
-  authentication, global and scheduled refresh publication, and sign-in
-  behavior.
+- Account and quota semantics, reset-credit semantics, authentication, refresh
+  request order and eligibility, no-overlap behavior, and sign-in behavior.
 - Native row reordering, saved order, share-view editing, measured list and
   popover geometry, header, footer, settings, menu-bar identity, and
   distribution behavior.
@@ -103,10 +103,11 @@ product requirements.
 - `script/build_and_run.sh --verify` proves a fresh bundle launches.
 - Computer Use acceptance opens the fresh popover, inspects representative
   cards, activates **Refresh all**, observes progress move through the accounts
-  one fixed slot at a time without card movement, verifies the same slot for a
-  manual account refresh, then activates a trash icon, observes the native
-  alert and its exact actions/message, chooses **Cancel**, and verifies that
-  the card remains.
+  one fixed slot at a time, verifies that each completed row publishes its
+  terminal values and **Updated just now** before progress moves on, verifies
+  the same slot for a manual account refresh, then activates a trash icon,
+  observes the native alert and its exact actions/message, chooses **Cancel**,
+  and verifies that the card remains.
   Destructive confirmation is exercised only against a disposable profile;
   real owner accounts are never removed for QA.
 - Before/reference/after component screenshots and a full-popover capture are
@@ -172,3 +173,24 @@ product requirements.
 - **Specification paths changed:** this contract and
   `docs/specs/features/codex-account-status.md`.
 - **New contract revision:** `account-card` revision 3.
+
+## Contract Delta: incremental-account-refresh-publication-1
+
+- **Change mode:** Evolve.
+- **Authorized by:** owner clarification and implementation approval on
+  2026-08-13.
+- **Previous behavior:** sequential refresh operations collected every
+  account's terminal result and published all changed rows together only after
+  the final request completed.
+- **New behavior:** each account publishes its complete terminal result,
+  including the new **Updated** value, immediately after its own request
+  completes and before processing advances to the next account.
+- **Compatibility:** request order, no-overlap, managed-token flow, scheduler
+  eligibility, removal safety, local nicknames, and persistence remain
+  unchanged; only terminal-result publication timing changes.
+- **Adjacent domains checked:** spinner provenance, authentication recovery,
+  removal, profile order, share view, popover measurement, and quota semantics
+  remain protected.
+- **Specification paths changed:** this contract and
+  `docs/specs/features/codex-account-status.md`.
+- **New contract revision:** `account-card` revision 4.
