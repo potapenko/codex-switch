@@ -18,12 +18,35 @@ final class PopoverLayoutState {
 
 enum PopoverLayout {
     static let minimumHeight: CGFloat = 260
+    static let minimumListViewportHeight: CGFloat = 80
+    static let profileRowVerticalPadding: CGFloat = 6
     // NSPopover adds roughly 26 points of arrow/chrome outside its SwiftUI content.
     // Reserve another 14 points so the outer popover does not touch the screen edge.
     static let screenEdgeMargin: CGFloat = 40
 
     static func maximumHeight(forVisibleScreenHeight visibleScreenHeight: CGFloat) -> CGFloat {
         max(minimumHeight, visibleScreenHeight - screenEdgeMargin)
+    }
+
+    static func measuredListContentHeight(
+        profileIDs: [UUID],
+        rowHeights: [UUID: CGFloat]
+    ) -> CGFloat? {
+        guard !profileIDs.isEmpty else { return 0 }
+        var total: CGFloat = 0
+        for profileID in profileIDs {
+            guard let height = rowHeights[profileID], height > 0 else { return nil }
+            total += height
+        }
+        return total
+    }
+}
+
+private struct ProfileRowHeightPreferenceKey: PreferenceKey {
+    static let defaultValue: [UUID: CGFloat] = [:]
+
+    static func reduce(value: inout [UUID: CGFloat], nextValue: () -> [UUID: CGFloat]) {
+        value.merge(nextValue(), uniquingKeysWith: { _, newValue in newValue })
     }
 }
 
@@ -32,14 +55,11 @@ struct MenuBarView: View {
     @Bindable var popoverLayout: PopoverLayoutState
     @State private var areEmailsMasked = false
     @State private var isCLISettingsVisible = false
-    @State private var profileListViewportHeight: CGFloat
+    @State private var measuredProfileRowHeights: [UUID: CGFloat] = [:]
 
     init(appState: AppState, popoverLayout: PopoverLayoutState) {
         self.appState = appState
         self.popoverLayout = popoverLayout
-        _profileListViewportHeight = State(
-            initialValue: Self.desiredProfileListHeight(for: appState.profiles)
-        )
     }
 
     var body: some View {
@@ -105,7 +125,16 @@ struct MenuBarView: View {
                                 appState.updateNickname(nickname, for: profile.id)
                             }
                         )
-                        .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0))
+                        .padding(.vertical, PopoverLayout.profileRowVerticalPadding)
+                        .background {
+                            GeometryReader { geometry in
+                                Color.clear.preference(
+                                    key: ProfileRowHeightPreferenceKey.self,
+                                    value: [profile.id: geometry.size.height]
+                                )
+                            }
+                        }
+                        .listRowInsets(EdgeInsets())
                     }
                     .onMove { sourceOffsets, destination in
                         appState.moveAccounts(from: sourceOffsets, toOffset: destination)
@@ -114,11 +143,22 @@ struct MenuBarView: View {
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .frame(
-                    minHeight: min(profileListViewportHeight, 80),
+                    minHeight: min(
+                        profileListViewportHeight,
+                        PopoverLayout.minimumListViewportHeight
+                    ),
                     idealHeight: profileListViewportHeight,
                     maxHeight: profileListViewportHeight
                 )
                 .layoutPriority(-1)
+                .onPreferenceChange(ProfileRowHeightPreferenceKey.self) { rowHeights in
+                    let profileIDs = Set(appState.profiles.map(\.id))
+                    let currentRowHeights = rowHeights.filter {
+                        profileIDs.contains($0.key) && $0.value > 0
+                    }
+                    guard measuredProfileRowHeights != currentRowHeights else { return }
+                    measuredProfileRowHeights = currentRowHeights
+                }
             }
 
             Divider()
@@ -140,38 +180,13 @@ struct MenuBarView: View {
                 isCLISettingsVisible = true
             }
         }
-        .onChange(of: appState.profiles.count) {
-            profileListViewportHeight = desiredProfileListHeight
-        }
-        .onChange(of: desiredProfileListHeight) { _, newHeight in
-            guard !appState.isPopoverPresented else { return }
-            profileListViewportHeight = newHeight
-        }
-        .onChange(of: appState.isPopoverPresented) { _, isPresented in
-            guard !isPresented else { return }
-            profileListViewportHeight = desiredProfileListHeight
-        }
     }
 
-    private var desiredProfileListHeight: CGFloat {
-        Self.desiredProfileListHeight(for: appState.profiles)
-    }
-
-    private static func desiredProfileListHeight(for profiles: [AccountProfile]) -> CGFloat {
-        profiles.reduce(CGFloat.zero) { height, profile in
-            height + estimatedHeight(for: profile) + 10
-        }
-    }
-
-    private static func estimatedHeight(for profile: AccountProfile) -> CGFloat {
-        switch profile.snapshotState {
-        case .signInRequired:
-            profile.snapshot == nil ? 104 : 164
-        case .signingIn:
-            profile.snapshot == nil ? 92 : 140
-        case .fresh, .cached, .refreshing, .failed:
-            104
-        }
+    private var profileListViewportHeight: CGFloat {
+        PopoverLayout.measuredListContentHeight(
+            profileIDs: appState.profiles.map(\.id),
+            rowHeights: measuredProfileRowHeights
+        ) ?? popoverLayout.maximumHeight
     }
 
     private var refreshActivityIndicator: some View {

@@ -1,0 +1,11 @@
+Use case: ui-mockup
+Asset type: native macOS account-card layout reference
+Input images: Image 1 is the edit target and current account card.
+Target dimensions: 690 x 215 pixels, matching Image 1 exactly.
+Primary request: Redesign only this one CodexSwitch account card as a polished, production-ready native macOS 14 SwiftUI component in light appearance. Use a compact two-zone composition with a strong identity block and a clean status block, separated by spacing and alignment rather than heavy borders.
+Component purpose: Let the owner scan account identity, plan, remaining quota, reset time, earned-reset count, and freshness, then optionally remove the local card.
+Primary user decision: Understand quota health immediately; removal stays a quiet secondary destructive action.
+Keep this text verbatim and exactly once: "codex1@playphrase.me", "pro", "65% remaining", "Aug 18 at 2:15 AM", "0 resets", "Updated just now".
+Change: Replace the visible word "Remove" with one familiar native outline trash icon in the top trailing position.
+Layout direction: keep email and plan together as identity; give the quota badge a restrained availability tint; align reset date and updated metadata in one calm trailing column; place the reset-credit badge beneath the quota. Use a very subtle continuous rounded card surface with no nested cards.
+Constraints: one account card only; no popover header, footer, list shell, browser chrome, window chrome, extra controls, invented data, new labels, gradients, shadows, decorative artwork, emoji, or marketing treatment. Do not delete or hide any supplied information. Use semantic system colors and realistic macOS typography. Generated image is design evidence only; implementation must preserve real data and product contracts.

@@ -402,6 +402,40 @@ those credentials.
   explicit controls after the launch/on-open refresh completed.
 - Contract revision: `codex-account-status` revision 7.
 
+### Contract Delta: reactive-popover-content-geometry-8
+
+- Change mode: Evolve.
+- Authorized by: owner clarification and implementation approval on 2026-08-11.
+- Domain and clauses: `codex-account-status`, popover preferred height,
+  profile-list viewport, and overflow behavior.
+- Pinned baseline: released v1.0.6 and `codex-account-status` revision 7.
+- Previous behavior: each presentation pinned a list viewport derived from
+  state-specific row-height estimates. The estimate could reserve blank space
+  after the final row, and a real terminal-state geometry change could not grow
+  or shrink an already open popover.
+- New behavior: SwiftUI measures the rendered profile rows and reactively
+  updates the native list viewport and popover preferred size whenever visible
+  content geometry changes. The screen-derived maximum remains pinned for the
+  presentation; content below that limit stays compact, and only the profile
+  list scrolls after the complete popover exhausts the limit. Normal refresh
+  loading remains visually stable while terminal row content is preserved, but
+  an atomically published terminal result may intentionally resize the open
+  popover when its rendered geometry differs.
+- Compatibility: presentation-only evolution. Profile persistence, list order,
+  account actions, atomic refresh publication, authentication, quota semantics,
+  and process boundaries remain unchanged.
+- Protected domains: fixed popover width, native list reordering, visible
+  header/footer, inline CLI settings, row information design, global loading
+  feedback, credentials, Desktop/session switching, and background polling.
+- Required evidence: focused measured-height policy tests, full macOS tests,
+  bounded launch smoke, and fresh-build Computer Use observation that five
+  compact rows leave no trailing blank list space, actual visible-content
+  changes resize the open popover, and overflow remains screen-bounded and
+  scrollable.
+- Specification paths changed: this plan and
+  `docs/specs/features/codex-account-status.md`.
+- Contract revision: `codex-account-status` revision 8.
+
 ### Local data contract
 
 Keep only:

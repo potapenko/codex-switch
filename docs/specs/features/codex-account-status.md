@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 7
+- **Contract revision:** 8
 - **Authority:** Active
-- **Stability:** Released through v1.0.6
+- **Stability:** Released through v1.0.6; revision 8 evolving
 
 ## Goal
 
@@ -62,13 +62,18 @@ separately authenticated ChatGPT accounts.
   limit, so they remain visible instead of extending the popover off-screen.
   The screen budget is recomputed before each presentation and remains pinned
   while that popover is open.
-- Each popover presentation establishes its list viewport before the on-open
-  refresh starts. Intermediate and completed per-profile refresh states do not
-  resize the outer popover or vertically move its header and footer while it is
-  open. If refreshed row content needs more space, it remains inside the
-  bounded scrollable list. A later popover presentation may size itself from
-  the then-current stable profile content. Adding or removing a profile while
-  the popover is open may intentionally recalculate the viewport.
+- While the popover is open, its preferred size follows the actual SwiftUI
+  geometry of its visible content. If a profile's terminal presentation or
+  another visible region grows or shrinks, the popover and profile-list
+  viewport recalculate immediately within the screen budget pinned for that
+  presentation. When the complete profile content fits, the list reserves no
+  blank space after its final row; only after the popover reaches the screen
+  limit does the list scroll. This behavior is driven by measured layout, not
+  profile-count checks or state-specific height estimates. A normal quota
+  refresh still preserves each row's terminal presentation while work is in
+  flight, so transient loading alone does not move the header, rows, or footer;
+  an atomically published terminal result may resize the popover when it
+  genuinely changes rendered row geometry.
 - The header reserves a fixed-size slot immediately before **Refresh all** for
   one native indeterminate progress indicator. The slot remains part of the
   layout while idle and only the indicator's visibility changes. While any
@@ -303,8 +308,10 @@ separately authenticated ChatGPT accounts.
 - `xcodebuild ... test` covers the build/test gate.
 - `script/build_and_run.sh --verify` proves the menu-bar process launches.
 - Computer Use acceptance observes the dedicated callout, its prominent action,
-  the fixed global loading indicator, unchanged coordinates for row content
-  throughout on-open refresh, screen-bounded growth for five and larger profile
-  sets, scrolling only after the current display budget is exhausted, and the
-  pending browser-sign-in presentation in the freshly built popover; light and
-  dark appearances retain readable contrast and hierarchy.
+  the fixed global loading indicator, stable coordinates while transient
+  loading leaves row geometry unchanged, measured growth and shrinkage when
+  visible content genuinely changes, no blank list space after the final row,
+  screen-bounded growth for five and larger profile sets, scrolling only after
+  the current display budget is exhausted, and the pending browser-sign-in
+  presentation in the freshly built popover; light and dark appearances retain
+  readable contrast and hierarchy.

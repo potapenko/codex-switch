@@ -164,6 +164,36 @@ final class QuotaResponseDecoderTests: XCTestCase {
         )
     }
 
+    func testPopoverListHeightTracksCompleteMeasuredRowGeometry() throws {
+        let firstID = UUID()
+        let secondID = UUID()
+
+        XCTAssertNil(
+            PopoverLayout.measuredListContentHeight(
+                profileIDs: [firstID, secondID],
+                rowHeights: [firstID: 88]
+            )
+        )
+        XCTAssertEqual(
+            try XCTUnwrap(
+                PopoverLayout.measuredListContentHeight(
+                    profileIDs: [firstID, secondID],
+                    rowHeights: [firstID: 88, secondID: 92]
+                )
+            ),
+            180
+        )
+        XCTAssertEqual(
+            try XCTUnwrap(
+                PopoverLayout.measuredListContentHeight(
+                    profileIDs: [firstID, secondID],
+                    rowHeights: [firstID: 88, secondID: 146]
+                )
+            ),
+            234
+        )
+    }
+
     func testRefreshBatchPublishesTerminalProfilesWithoutRestoringRemovedRows() {
         let first = AccountProfile(label: "First", nickname: "Pinned name", snapshotState: .cached)
         let second = AccountProfile(label: "Second", snapshotState: .cached)

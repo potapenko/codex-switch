@@ -10,62 +10,46 @@ struct ProfileRow: View {
     let signIn: () -> Void
     let saveNickname: (String) -> Void
     @State private var isEditingNickname = false
+    @State private var isRemovalConfirmationPresented = false
     @State private var nicknameDraft = ""
     @FocusState private var isAccountNameFocused: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack(spacing: 10) {
-                profileName
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .help(displayName)
-                if let plan = profile.snapshot?.plan {
-                    Text(plan)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                        .fixedSize(horizontal: true, vertical: false)
-                        .layoutPriority(1)
-                }
-                retryActionSlot
-                Button("Remove", role: .destructive, action: remove)
-                    .buttonStyle(.borderless)
-                    .fixedSize()
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            heading
             if let snapshot = profile.snapshot {
-                if let primary = codexPrimaryWindow(in: snapshot), let usedPercent = primary.usedPercent {
-                    quotaLine(primary: primary, usedPercent: usedPercent)
-                } else {
-                    Text("Quota unavailable")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-                if let resetCredits = snapshot.resetCredits {
-                    StatusBadge(
-                        title: "\(resetCredits.availableCount) resets",
-                        systemImage: "arrow.counterclockwise",
-                        tint: resetCredits.badgeTone.tint
-                    )
-                    .accessibilityLabel(resetCredits.hasAvailableCredits ? "\(resetCredits.availableCount) reset credits available" : "No reset credits available")
-                }
-                TimelineView(.periodic(from: .now, by: 60)) { context in
-                    Text(QuotaPresentation.updatedText(for: snapshot.refreshedAt, now: context.date))
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
+                cardDivider
+                snapshotContent(snapshot)
             } else if recoveryMode == nil {
+                cardDivider
                 Text(statusText).font(.footnote).foregroundStyle(.secondary)
             }
             if let recoveryMode {
+                cardDivider
                 ProfileRecoveryCallout(
                     mode: recoveryMode,
                     isActionEnabled: canSignIn,
                     signIn: signIn
                 )
             } else if let error = profile.lastError {
+                cardDivider
                 Text(error).font(.footnote).foregroundStyle(.red)
             }
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+        }
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .alert("Remove account?", isPresented: $isRemovalConfirmationPresented) {
+            Button("Cancel", role: .cancel) {}
+                .keyboardShortcut(.defaultAction)
+            Button("Remove account", role: .destructive, action: remove)
+        } message: {
+            Text("Remove \(displayName) from CodexSwitch? The local dashboard entry and cached quota data will be removed. Codex sign-in data and isolated profile files will stay on this Mac.")
         }
         .onChange(of: areEmailsMasked) { _, isMasked in
             if !isMasked {
@@ -80,6 +64,70 @@ struct ProfileRow: View {
                 Button("Retry", action: retry)
             }
         }
+    }
+
+    private var heading: some View {
+        HStack(spacing: 8) {
+            profileName
+                .lineLimit(1)
+                .truncationMode(.middle)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .help(displayName)
+            if let plan = profile.snapshot?.plan {
+                AccountPlanBadge(title: plan)
+                    .layoutPriority(1)
+            }
+            retryActionSlot
+            Button {
+                isRemovalConfirmationPresented = true
+            } label: {
+                Image(systemName: "trash")
+                    .foregroundStyle(.secondary)
+                    .frame(width: 18, height: 18)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.borderless)
+            .frame(width: 24, height: 24)
+            .help("Remove account")
+            .accessibilityLabel("Remove account: \(displayName)")
+            .accessibilityHint("Asks for confirmation before removing this account from CodexSwitch")
+        }
+    }
+
+    @ViewBuilder
+    private func snapshotContent(_ snapshot: AccountSnapshot) -> some View {
+        if let primary = codexPrimaryWindow(in: snapshot), let usedPercent = primary.usedPercent {
+            quotaLine(primary: primary, usedPercent: usedPercent)
+        } else {
+            Text("Quota unavailable")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+
+        cardDivider
+
+        HStack(spacing: 8) {
+            if let resetCredits = snapshot.resetCredits {
+                AccountStatusBadge(
+                    title: "\(resetCredits.availableCount) resets",
+                    systemImage: "arrow.counterclockwise",
+                    tint: resetCredits.badgeTone.cardTint
+                )
+                .accessibilityLabel(resetCredits.hasAvailableCredits ? "\(resetCredits.availableCount) reset credits available" : "No reset credits available")
+            }
+            Spacer(minLength: 8)
+            TimelineView(.periodic(from: .now, by: 60)) { context in
+                Text(QuotaPresentation.updatedText(for: snapshot.refreshedAt, now: context.date))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+        }
+    }
+
+    private var cardDivider: some View {
+        Divider()
+            .padding(.vertical, 8)
     }
 
     @ViewBuilder
@@ -186,9 +234,10 @@ struct ProfileRow: View {
     private func quotaLine(primary: QuotaWindow, usedPercent: Double) -> some View {
         let remaining = QuotaPresentation.remainingPercent(from: usedPercent)
         return HStack {
-            StatusBadge(
+            AccountStatusBadge(
                 title: "\(remaining)% remaining",
-                tint: QuotaPresentation.availabilityTone(forRemainingPercent: remaining).tint
+                progress: Double(remaining) / 100,
+                tint: QuotaPresentation.availabilityTone(forRemainingPercent: remaining).cardTint
             )
             Spacer()
             if let resetAt = primary.resetAt {
@@ -207,49 +256,5 @@ struct ProfileRow: View {
     private func accessibilityLabel(for primary: QuotaWindow, usedPercent: Double, remaining: Int) -> String {
         let reset = primary.resetAt.map { ", resets \($0.formatted(date: .abbreviated, time: .shortened))" } ?? ""
         return "Codex, \(remaining) percent remaining, \(Int(usedPercent.rounded())) percent used\(reset)"
-    }
-}
-
-private struct StatusBadge: View {
-    let title: String
-    var systemImage: String? = nil
-    let tint: Color
-
-    var body: some View {
-        HStack(spacing: 4) {
-            if let systemImage {
-                Image(systemName: systemImage)
-                    .imageScale(.small)
-            }
-            Text(title)
-        }
-        .font(.caption.weight(.semibold))
-        .foregroundStyle(.primary)
-        .padding(.horizontal, 7)
-        .padding(.vertical, 3)
-        .background(tint.opacity(0.2), in: Capsule())
-        .overlay {
-            Capsule()
-                .stroke(tint.opacity(0.42), lineWidth: 1)
-        }
-    }
-}
-
-private extension QuotaPresentation.AvailabilityTone {
-    var tint: Color {
-        switch self {
-        case .abundant: .green
-        case .limited: .yellow
-        case .low: .orange
-        }
-    }
-}
-
-private extension ResetCredits.BadgeTone {
-    var tint: Color {
-        switch self {
-        case .neutral: .gray
-        case .available: .accentColor
-        }
     }
 }
