@@ -640,3 +640,26 @@ switch action.
   CodexSwitch is active and cannot repair a profile that already requires
   interactive browser sign-in. Desktop Codex account switching remains out of
   scope.
+
+## Release Contract Baseline: v1.0.7
+
+- **Release:** `v1.0.7`, build `14`, published 2026-08-13.
+- **Implementation revision:** `6b68b0c5ba02660e7f1d980c962abfba9425a764`.
+- **Specification revisions:** `codex-account-status` revision 8,
+  `account-card` revision 1, and the active direct-distribution contract.
+- **Included domains:** measured reactive popover geometry, compact
+  system-adaptive account cards, the quota progress-ring scan cue, and guarded
+  local account removal, plus all behavior released through `v1.0.6`.
+- **QA and runtime evidence:** the owner confirmed the release slice was fully
+  tested before publication. Nineteen macOS tests passed locally and in GitHub
+  Actions; workflow run `31669187920` built, signed, notarized, stapled, and
+  published the app and DMG. Independent download verification passed the
+  four-asset inventory, public manifest, checksums, `codesign`, stapler,
+  Gatekeeper, and DMG-layout checks.
+- **Compatibility and migration:** presentation and removal-confirmation
+  evolution only; existing profile metadata, cached snapshots, isolated
+  `CODEX_HOME` directories, account ordering, refresh behavior, and the
+  confirmed removal effect remain compatible. No migration is required.
+- **Known exclusions and residuals:** the release does not add in-app updating,
+  Homebrew distribution, or Desktop Codex account switching; those remain out
+  of scope.

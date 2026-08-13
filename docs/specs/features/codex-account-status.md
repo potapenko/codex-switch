@@ -2,7 +2,7 @@
 
 - **Contract revision:** 8
 - **Authority:** Active
-- **Stability:** Released through v1.0.6; revision 8 evolving
+- **Stability:** Released through v1.0.7
 
 ## Goal
 

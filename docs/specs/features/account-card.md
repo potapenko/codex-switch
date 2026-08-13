@@ -2,7 +2,7 @@
 
 - **Contract revision:** 1
 - **Authority:** Active
-- **Stability:** Evolving
+- **Stability:** Released through v1.0.7
 - **Precedence:** This contract governs account-card presentation and removal
   confirmation. `codex-account-status` revision 8 continues to govern account
   data, state, ordering, refresh, authentication, persistence, and popover
