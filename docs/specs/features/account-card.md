@@ -1,10 +1,10 @@
 # Account card
 
-- **Contract revision:** 4
+- **Contract revision:** 5
 - **Authority:** Active
-- **Stability:** Released through v1.0.7; per-account refresh feedback evolving
+- **Stability:** Released through v1.0.7; button focus policy evolving
 - **Precedence:** This contract governs account-card presentation and removal
-  confirmation. `codex-account-status` revision 11 continues to govern account
+  confirmation. `codex-account-status` revision 12 continues to govern account
   data, state, ordering, refresh, authentication, persistence, and popover
   geometry.
 
@@ -84,8 +84,9 @@ product requirements.
   labels and hints. The local progress indicator names the account being
   refreshed. The quota ring is decorative for accessibility because the full
   remaining and used values stay in the existing quota label.
-- Status meaning never relies on colour or iconography alone. Keyboard focus,
-  Escape cancellation, pointer help, share-view naming, and full account-label
+- Status meaning never relies on colour or iconography alone. Card buttons do
+  not participate in keyboard focus traversal, while text-entry focus, Escape
+  cancellation, pointer help, share-view naming, and full account-label
   accessibility remain available.
 
 ## Protected behavior
@@ -194,3 +195,24 @@ product requirements.
 - **Specification paths changed:** this contract and
   `docs/specs/features/codex-account-status.md`.
 - **New contract revision:** `account-card` revision 4.
+
+## Contract Delta: non-focusable-buttons-1
+
+- **Change mode:** Evolve.
+- **Authorized by:** owner request and approved implementation scope on
+  2026-08-15.
+- **Previous behavior:** card buttons participated in macOS keyboard focus
+  traversal and could display the system focus ring.
+- **New behavior:** refresh, removal, recovery, inline-name activation, and
+  confirmation buttons opt out of keyboard focus traversal while their pointer
+  and accessibility actions remain unchanged; the account-name field retains
+  text-entry focus.
+- **Compatibility:** focus eligibility only; action effects, confirmation
+  safety, refresh, recovery, naming, persistence, and card geometry remain
+  unchanged.
+- **Adjacent domains checked:** global popover controls, quota semantics,
+  authentication, profile order, share view, settings, and distribution remain
+  protected.
+- **Specification paths changed:** this contract and
+  `docs/specs/features/codex-account-status.md`.
+- **New contract revision:** `account-card` revision 5.

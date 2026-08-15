@@ -74,6 +74,7 @@ struct MenuBarView: View {
                     Image(systemName: areEmailsMasked ? "eye.slash" : "eye")
                 }
                 .buttonStyle(.borderless)
+                .focusable(false)
                 .help(areEmailsMasked ? "Show email addresses" : "Mask email addresses")
                 .accessibilityLabel(areEmailsMasked ? "Show email addresses" : "Mask email addresses")
                 Button {
@@ -82,12 +83,14 @@ struct MenuBarView: View {
                     Image(systemName: "gearshape")
                 }
                 .buttonStyle(.borderless)
+                .focusable(false)
                 .help("Codex CLI settings")
                 .accessibilityLabel("Codex CLI settings")
                 refreshActivityIndicator
                 Button("Refresh all") {
                     Task { await appState.refreshAll() }
                 }
+                .focusable(false)
                 .disabled(appState.isRefreshing || appState.profiles.isEmpty)
             }
 
@@ -167,10 +170,12 @@ struct MenuBarView: View {
                 Button("Add account") {
                     Task { await appState.addAccount() }
                 }
+                .focusable(false)
                 Spacer()
                 Button("Quit") {
                     NSApp.terminate(nil)
                 }
+                .focusable(false)
             }
         }
         .padding(14)

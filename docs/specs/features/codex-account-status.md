@@ -1,8 +1,8 @@
 # Codex account status
 
-- **Contract revision:** 11
+- **Contract revision:** 12
 - **Authority:** Active
-- **Stability:** Released through v1.0.7; per-account refresh feedback evolving
+- **Stability:** Released through v1.0.7; button focus policy evolving
 
 ## Goal
 
@@ -240,6 +240,11 @@ separately authenticated ChatGPT accounts.
   not replace the explicit controls.
 - The popover closes when the owner clicks outside it, including when another
   application or window becomes active.
+- SwiftUI buttons in the CodexSwitch popover do not participate in macOS
+  keyboard focus traversal and do not show a keyboard focus ring. They remain
+  fully pointer-operable and retain their accessibility labels, hints, roles,
+  and actions. Text fields keep their normal focus behavior so account-name and
+  Codex CLI path editing continue to support typing, Enter, and Escape.
 - The app never redeems a reset credit; it may display the available count.
 - “Updated” uses whole-minute language (for example, “Updated 2 min ago”) and
   is refreshed in the interface at most once per minute. It never shows
@@ -373,3 +378,23 @@ separately authenticated ChatGPT accounts.
   policy, authentication, quota semantics, removal safety, profile order, and
   local nicknames remain unchanged.
 - **New contract revision:** `codex-account-status` revision 11.
+
+## Contract Delta: non-focusable-buttons-1
+
+- **Change mode:** Evolve.
+- **Authorized by:** owner request and approved implementation scope on
+  2026-08-15.
+- **Previous behavior:** SwiftUI buttons participated in macOS keyboard focus
+  traversal and could display the system focus ring.
+- **New behavior:** every SwiftUI button opts out of keyboard focus traversal;
+  pointer and accessibility actions remain available, while text fields retain
+  their normal focus behavior.
+- **Compatibility:** presentation and keyboard-focus eligibility only; button
+  actions, shortcuts, account state, refresh, authentication, removal,
+  persistence, ordering, and popover geometry remain unchanged.
+- **Adjacent domains checked:** account-card actions, inline account-name
+  editing, Codex CLI path editing, confirmation semantics, share view, and
+  distribution remain protected.
+- **Specification paths changed:** this contract and
+  `docs/specs/features/account-card.md`.
+- **New contract revision:** `codex-account-status` revision 12.

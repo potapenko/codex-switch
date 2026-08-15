@@ -34,6 +34,7 @@ struct CodexCLISettingsDialog: View {
                         Image(systemName: "doc.on.doc")
                     }
                     .buttonStyle(.borderless)
+                    .focusable(false)
                     .help("Copy command")
                     .accessibilityLabel("Copy command")
                 }
@@ -50,6 +51,7 @@ struct CodexCLISettingsDialog: View {
                         Image(systemName: "clipboard")
                     }
                     .buttonStyle(.borderless)
+                    .focusable(false)
                     .padding(.trailing, 6)
                     .help("Paste path")
                     .accessibilityLabel("Paste path")
@@ -57,6 +59,7 @@ struct CodexCLISettingsDialog: View {
 
             HStack {
                 Button("Choose…", action: chooseExecutable)
+                    .focusable(false)
                 Spacer()
                 if isSaving {
                     ProgressView()
@@ -75,9 +78,11 @@ struct CodexCLISettingsDialog: View {
                     appState.dismissCLISettingsRequest()
                     close()
                 }
+                .focusable(false)
                 Spacer()
                 Button("Save", action: save)
                     .keyboardShortcut(.defaultAction)
+                    .focusable(false)
                     .disabled(path.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
             }
         }

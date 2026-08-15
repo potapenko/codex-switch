@@ -55,6 +55,7 @@ struct ProfileRecoveryCallout: View {
 
             Button("Sign in again", action: signIn)
                 .buttonStyle(.borderedProminent)
+                .focusable(false)
                 .controlSize(.regular)
                 .tint(.orange)
                 .fixedSize(horizontal: true, vertical: false)

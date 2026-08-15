@@ -48,7 +48,9 @@ struct ProfileRow: View {
         .alert("Remove account?", isPresented: $isRemovalConfirmationPresented) {
             Button("Cancel", role: .cancel) {}
                 .keyboardShortcut(.defaultAction)
+                .focusable(false)
             Button("Remove account", role: .destructive, action: remove)
+                .focusable(false)
         } message: {
             Text("Remove \(displayName) from CodexSwitch? The local dashboard entry and cached quota data will be removed. Codex sign-in data and isolated profile files will stay on this Mac.")
         }
@@ -61,8 +63,10 @@ struct ProfileRow: View {
         .accessibilityActions {
             if canSignIn {
                 Button("Sign in again", action: signIn)
+                    .focusable(false)
             } else if canRefresh {
                 Button("Refresh account", action: refresh)
+                    .focusable(false)
             }
         }
     }
@@ -88,6 +92,7 @@ struct ProfileRow: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.borderless)
+            .focusable(false)
             .frame(width: 24, height: 24)
             .help("Remove account")
             .accessibilityLabel("Remove account: \(displayName)")
@@ -162,6 +167,7 @@ struct ProfileRow: View {
                     Text(displayName).fontWeight(.medium)
                 }
                 .buttonStyle(.plain)
+                .focusable(false)
                 .disabled(isRefreshing)
                 .help("Edit account name")
                 .accessibilityLabel("Edit account name: \(displayName)")
@@ -233,6 +239,7 @@ struct ProfileRow: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.borderless)
+                .focusable(false)
                 .disabled(!canRefresh)
                 .frame(width: 24, height: 24)
                 .help("Refresh account")
