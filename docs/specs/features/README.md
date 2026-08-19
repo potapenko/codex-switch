@@ -1,0 +1,25 @@
+# Feature Contracts
+
+- Node type: branch
+- Status: Active
+- Revision: `codex-switch.features@1`
+- Read when: selecting a CodexSwitch product-domain contract.
+- Do not read when: only migration status or authoring guidance is needed.
+- Maximum size: 100 physical lines.
+
+This branch routes to independently selectable product responsibilities. Its
+summaries are navigation only.
+
+## Accounts
+
+- [Codex account status](codex-account-status.md) — profile setup, login,
+  refresh, quota/reset display, local data, or privacy. Legacy migration is
+  pending; the existing contract remains protected.
+- [Account card](account-card.md) — account-row presentation, hierarchy,
+  accessibility, refresh controls, or guarded removal. Legacy migration is
+  pending; the existing contract remains protected.
+
+## Distribution
+
+- [Direct macOS distribution](direct-distribution.md) — release packaging,
+  signing, notarization, GitHub Releases, or installation.

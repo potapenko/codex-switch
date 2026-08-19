@@ -1,7 +1,11 @@
-# Spec index
+# Legacy Spec Index
 
-| Area | Spec | Read when |
-| --- | --- | --- |
-| Codex account status | `features/codex-account-status.md` | Profile setup, login, refresh, quota/reset display, local data, or privacy |
-| Account card | `features/account-card.md` | Account-row presentation, hierarchy, accessibility, or removal confirmation |
-| Direct macOS distribution | `features/direct-distribution.md` | Release packaging, signing, notarization, GitHub Releases, or installation |
+- Node type: branch
+- Status: Superseded
+- Revision: `codex-switch.legacy-spec-index@1`
+- Read when: following an existing link to the former specification entrypoint.
+- Do not read when: starting new specification discovery.
+- Maximum size: 100 physical lines.
+
+The canonical entrypoint is now [CodexSwitch Specifications](README.md).
+This compatibility node defines no product behavior.

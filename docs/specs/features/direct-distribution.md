@@ -1,11 +1,25 @@
 # Direct macOS distribution
 
-## Goal
+- Node type: leaf
+- Status: Active
+- Contract ID: `codex-switch.direct-distribution`
+- Domain ID: `codex-switch.direct-distribution`
+- Authority: Active
+- Stability: Released (conservative legacy baseline)
+- Contract revision: `codex-switch.direct-distribution@1`
+- Clauses: `DISTRIBUTION.GOAL`, `DISTRIBUTION.PUBLIC`,
+  `DISTRIBUTION.RELEASE`, `DISTRIBUTION.INVARIANTS`, `DISTRIBUTION.VERIFY`
+- Read when: packaging, signing, notarization, publishing, installation, or
+  verification of a public CodexSwitch release is in scope.
+- Do not read when: the task concerns account state or account-card behavior.
+- Maximum size: 100 physical lines.
+
+## DISTRIBUTION.GOAL — Goal
 
 Let people install CodexSwitch safely from a GitHub Release without building it
 from source.
 
-## User-visible behavior
+## DISTRIBUTION.PUBLIC — User-visible behavior
 
 - Every public version is a GitHub Release identified by a `v<version>` tag.
 - A public release offers a notarized `CodexSwitch-<version>.dmg` as the
@@ -19,7 +33,7 @@ from source.
   In-app updating and Homebrew are out of scope until they are deliberately
   designed and implemented.
 
-## Release contract
+## DISTRIBUTION.RELEASE — Release contract
 
 - A GitHub Actions workflow runs for a pushed `v*` tag or explicit manual
   dispatch with a version and positive build number.
@@ -34,7 +48,7 @@ from source.
 - A local preview command may create unsigned/non-notarized artifacts for
   packaging checks, but its manifest explicitly marks them as non-public.
 
-## Invariants
+## DISTRIBUTION.INVARIANTS — Invariants
 
 - No certificate, private key, password, token, account payload, or OAuth
   material is committed, logged, packaged, or attached to a release.
@@ -45,7 +59,7 @@ from source.
 - A release script never deletes an existing artifact directory; it fails so
   an operator can inspect or choose a new version/build.
 
-## Verification mapping
+## DISTRIBUTION.VERIFY — Verification mapping
 
 - `scripts/release/build_preview.sh` proves local Release packaging without
   publishing anything.
