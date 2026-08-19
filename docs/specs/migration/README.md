@@ -2,7 +2,7 @@
 
 - Node type: root
 - Migration ID: `codex-switch-legacy-spec-migration`
-- Status: in_progress
+- Status: complete
 - Change mode: Reconcile; Discover only for missing or conflicting authority
 - Approved by: user, 2026-08-19
 - Source specification root: `docs/specs`
@@ -44,7 +44,10 @@
   one 400-line source split by responsibility.
   [Receipt 002](receipts/002-codex-account-status.md) records fidelity and
   checkpoint validation.
-- 003 — account card — next; one 218-line source.
+- [003 — account card](batches/003-account-card.md) — complete; one 218-line
+  source split by responsibility.
+  [Receipt 003](receipts/003-account-card.md) records fidelity and terminal
+  corpus validation.
 
 ## Resume
 
@@ -53,7 +56,6 @@ linked sources and direct dependencies. Do not reload completed source bodies.
 
 ## Completion
 
-Four of five legacy sources have terminal dispositions. Completion requires
-the remaining account-card contract to be split by responsibility, all links
-and coverage to resolve, every node to stay within 100 lines, and no JSON
-routing state.
+All five legacy sources have terminal dispositions. Every Active contract is
+reachable from the canonical root, all declared nodes are within 100 lines,
+coverage and links resolve, and no JSON routing state exists.
