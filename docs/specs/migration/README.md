@@ -40,8 +40,11 @@
   — complete; three sources dispositioned.
   [Receipt 001](receipts/001-root-distribution-and-template.md) records hashes,
   semantic disposition, and checkpoint validation.
-- 002 — Codex account status — next; one 400-line source.
-- 003 — account card — pending; one 218-line source.
+- [002 — Codex account status](batches/002-codex-account-status.md) — complete;
+  one 400-line source split by responsibility.
+  [Receipt 002](receipts/002-codex-account-status.md) records fidelity and
+  checkpoint validation.
+- 003 — account card — next; one 218-line source.
 
 ## Resume
 
@@ -50,6 +53,7 @@ linked sources and direct dependencies. Do not reload completed source bodies.
 
 ## Completion
 
-Three of five legacy sources have terminal dispositions. Completion requires
-both remaining contracts to be split by responsibility, all links and coverage
-to resolve, every node to stay within 100 lines, and no JSON routing state.
+Four of five legacy sources have terminal dispositions. Completion requires
+the remaining account-card contract to be split by responsibility, all links
+and coverage to resolve, every node to stay within 100 lines, and no JSON
+routing state.
